@@ -502,7 +502,7 @@ export function IssueCertificate() {
               institution={formData.institution || 'Institute Name'}
               issueDate={new Date().toISOString()}
               certificateHash={result.certificateHash}
-              issuerName="Yash Gayake"
+              issuerName="Authorized Signatory"
               issuerTitle="Registrar"
             />
           </div>
@@ -718,7 +718,7 @@ export function IssueCertificate() {
               institution={formData.institution || 'Institute Name'}
               issueDate={new Date().toISOString()}
               certificateHash={previewHash}
-              issuerName="Yash Gayake"
+              issuerName="Authorized Signatory"
               issuerTitle="Registrar"
             />
           </div>
@@ -732,7 +732,7 @@ export function IssueCertificate() {
               institution={formData.institution || 'Institute Name'}
               issueDate={new Date().toISOString()}
               certificateHash={previewHash}
-              issuerName="Yash Gayake"
+              issuerName="Authorized Signatory"
               issuerTitle="Registrar"
             />
           </div>

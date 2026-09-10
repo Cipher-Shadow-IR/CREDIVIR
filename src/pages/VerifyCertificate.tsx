@@ -22,7 +22,11 @@ import {
   User,
   Loader2,
   Eye,
-  Download
+  Download,
+  Copy,
+  Check,
+  ShieldCheck,
+  ExternalLink
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -72,12 +76,30 @@ export default function VerifyCertificate() {
   const [showCertificatePreview, setShowCertificatePreview] = useState(false);
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
 
+  const [copiedHash, setCopiedHash] = useState(false);
+  const [copiedIssuer, setCopiedIssuer] = useState(false);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const previewRef = useRef<HTMLDivElement | null>(null);
 
   const { getCertificateByHash } = useAppContext();
   const { toast } = useToast();
   const location = useLocation();
+
+  const copyToClipboard = (text: string, type: 'hash' | 'issuer') => {
+    navigator.clipboard.writeText(text);
+    if (type === 'hash') {
+      setCopiedHash(true);
+      setTimeout(() => setCopiedHash(false), 2000);
+    } else {
+      setCopiedIssuer(true);
+      setTimeout(() => setCopiedIssuer(false), 2000);
+    }
+    toast({
+      title: 'Copied to Clipboard',
+      description: `${type === 'hash' ? 'Certificate hash' : 'Issuer address'} copied.`
+    });
+  };
 
   const extractHashFromInput = (input: string) => {
     const trimmed = input.trim();
@@ -346,123 +368,151 @@ export default function VerifyCertificate() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <div className="container py-8">
+      <div className="container py-10 max-w-4xl">
         <div className="mx-auto max-w-2xl">
           <div className="mb-8 text-center">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-accent to-warning">
-              <CheckCircle className="h-8 w-8 text-primary-foreground" />
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-600 to-blue-700 text-white shadow-lg shadow-indigo-500/20">
+              <ShieldCheck className="h-7 w-7" />
             </div>
-            <h1 className="text-3xl font-bold">Verify Certificate</h1>
-            <p className="mt-2 text-muted-foreground">
-              Verify any certificate authenticity on the blockchain
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-mono font-medium text-primary mb-3">
+              CREDIVIR PROTOCOL • LIVE ATTESTATION VERIFIER
+            </div>
+            <h1 className="text-3xl font-extrabold tracking-tight">On-Chain Credential Attestation</h1>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Verify authentic academic degrees and transcripts directly against Ethereum state
             </p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Contract: {DEFAULT_CONTRACT_ADDRESS.slice(0, 10)}...
-              {DEFAULT_CONTRACT_ADDRESS.slice(-6)}
-            </p>
+            <div className="mt-3 inline-flex items-center gap-2 rounded-lg border border-border/60 bg-muted/40 px-3 py-1 font-mono text-xs text-muted-foreground">
+              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Contract: {DEFAULT_CONTRACT_ADDRESS.slice(0, 8)}...{DEFAULT_CONTRACT_ADDRESS.slice(-6)}</span>
+            </div>
           </div>
 
           <div id="file-scanner" style={{ display: 'none' }} />
 
           {verificationResult && (
             <Card
-              className={`mb-6 ${
+              className={`mb-8 overflow-hidden border shadow-xl ${
                 verificationResult.isValid
-                  ? 'border-success/50 bg-success/5'
-                  : 'border-destructive/50 bg-destructive/5'
+                  ? 'border-emerald-500/40 bg-emerald-500/[0.03]'
+                  : 'border-destructive/40 bg-destructive/[0.03]'
               }`}
             >
-              <CardContent className="pt-6">
+              <CardContent className="pt-6 space-y-6">
                 {verificationResult.isValid ? (
                   <div className="space-y-6">
-                    <div className="flex items-center gap-4">
-                      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-success/10">
-                        <CheckCircle className="h-10 w-10 text-success" />
+                    <div className="flex items-center justify-between border-b border-border/50 pb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                          <CheckCircle className="h-7 w-7" />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xl font-bold tracking-tight text-emerald-600 dark:text-emerald-400">
+                              AUTHENTIC CERTIFICATE
+                            </span>
+                            <span className="rounded bg-emerald-500/10 px-2 py-0.5 font-mono text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase">
+                              Verified
+                            </span>
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            {verificationResult.verifiedOnBlockchain
+                              ? 'Immutable state verified on Ethereum RPC node'
+                              : 'Verified cryptographically from local attestation cache'}
+                          </p>
+                        </div>
                       </div>
+                    </div>
+
+                    <div className="rounded-xl border border-border/60 bg-card/60 p-4 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
+                          Credential Identifier
+                        </span>
+                        <span className="font-mono text-xs font-bold text-primary">
+                          {getCertificateNumber()}
+                        </span>
+                      </div>
+
+                      <div className="grid gap-3 sm:grid-cols-2 pt-2 border-t border-border/40">
+                        <div>
+                          <span className="text-xs text-muted-foreground block">Graduate Name</span>
+                          <span className="font-semibold text-sm">{getStudentName()}</span>
+                        </div>
+                        <div>
+                          <span className="text-xs text-muted-foreground block">Enrollment ID</span>
+                          <span className="font-mono font-medium text-sm">
+                            {verificationResult.certificate?.enrollmentNumber ||
+                              verificationResult.localData?.enrollmentNumber || 'N/A'}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-xs text-muted-foreground block">Academic Program</span>
+                          <span className="font-medium text-sm">{getCourse()}</span>
+                        </div>
+                        <div>
+                          <span className="text-xs text-muted-foreground block">Issuing Authority</span>
+                          <span className="font-medium text-sm">{getInstitution()}</span>
+                        </div>
+                        <div>
+                          <span className="text-xs text-muted-foreground block">Graduation Year</span>
+                          <span className="font-mono text-sm">
+                            {verificationResult.certificate?.issueYear ||
+                              verificationResult.localData?.issueYear || 'N/A'}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-xs text-muted-foreground block">On-Chain Issuance Date</span>
+                          <span className="font-mono text-sm">
+                            {verificationResult.certificate
+                              ? new Date(verificationResult.certificate.issueDate * 1000).toLocaleDateString()
+                              : verificationResult.localData
+                              ? new Date(verificationResult.localData.issueDate).toLocaleDateString()
+                              : 'N/A'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Hashes & Keys with Copy */}
+                    <div className="space-y-3">
                       <div>
-                        <h3 className="text-2xl font-bold text-success">✓ VALID</h3>
-                        <p className="text-muted-foreground">
-                          {verificationResult.verifiedOnBlockchain
-                            ? 'Certificate verified on blockchain'
-                            : 'Verified from local records'}
-                        </p>
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs font-mono text-muted-foreground">Cryptographic SHA-256 Digest</span>
+                          <button
+                            type="button"
+                            onClick={() => copyToClipboard(getCertificateHash(), 'hash')}
+                            className="inline-flex items-center gap-1 text-[11px] font-mono text-primary hover:underline"
+                          >
+                            {copiedHash ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                            <span>{copiedHash ? 'Copied' : 'Copy Hash'}</span>
+                          </button>
+                        </div>
+                        <div className="break-all rounded-lg border border-border/60 bg-muted/40 p-2.5 font-mono text-xs text-muted-foreground">
+                          {getCertificateHash() || 'Hash not available'}
+                        </div>
                       </div>
+
+                      {verificationResult.certificate?.issuerAddress && (
+                        <div>
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-xs font-mono text-muted-foreground">Issuer Ethereum Address</span>
+                            <button
+                              type="button"
+                              onClick={() => copyToClipboard(verificationResult.certificate!.issuerAddress, 'issuer')}
+                              className="inline-flex items-center gap-1 text-[11px] font-mono text-primary hover:underline"
+                            >
+                              {copiedIssuer ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                              <span>{copiedIssuer ? 'Copied' : 'Copy Address'}</span>
+                            </button>
+                          </div>
+                          <div className="break-all rounded-lg border border-border/60 bg-muted/40 p-2.5 font-mono text-xs text-muted-foreground">
+                            {verificationResult.certificate.issuerAddress}
+                          </div>
+                        </div>
+                      )}
                     </div>
 
-                    <div className="rounded bg-muted/40 p-3">
-                      <p className="mb-1 text-sm text-muted-foreground">
-                        Certificate Number
-                      </p>
-                      <p className="font-semibold">{getCertificateNumber()}</p>
-                    </div>
-
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      <div className="space-y-1">
-                        <p className="text-sm text-muted-foreground">Student Name</p>
-                        <p className="font-medium">{getStudentName()}</p>
-                      </div>
-
-                      <div className="space-y-1">
-                        <p className="text-sm text-muted-foreground">Enrollment Number</p>
-                        <p className="font-medium">
-                          {verificationResult.certificate?.enrollmentNumber ||
-                            verificationResult.localData?.enrollmentNumber}
-                        </p>
-                      </div>
-
-                      <div className="space-y-1">
-                        <p className="text-sm text-muted-foreground">Course</p>
-                        <p className="font-medium">{getCourse()}</p>
-                      </div>
-
-                      <div className="space-y-1">
-                        <p className="text-sm text-muted-foreground">Institution</p>
-                        <p className="font-medium">{getInstitution()}</p>
-                      </div>
-
-                      <div className="space-y-1">
-                        <p className="text-sm text-muted-foreground">Issue Year</p>
-                        <p className="font-medium">
-                          {verificationResult.certificate?.issueYear ||
-                            verificationResult.localData?.issueYear}
-                        </p>
-                      </div>
-
-                      <div className="space-y-1">
-                        <p className="text-sm text-muted-foreground">Issue Date</p>
-                        <p className="font-medium">
-                          {verificationResult.certificate
-                            ? new Date(
-                                verificationResult.certificate.issueDate * 1000
-                              ).toLocaleDateString()
-                            : verificationResult.localData
-                            ? new Date(
-                                verificationResult.localData.issueDate
-                              ).toLocaleDateString()
-                            : 'N/A'}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div>
-                      <p className="mb-1 text-sm text-muted-foreground">Certificate Hash</p>
-                      <p className="break-all rounded bg-muted/50 p-2 font-mono text-xs">
-                        {getCertificateHash()}
-                      </p>
-                    </div>
-
-                    {verificationResult.certificate?.issuerAddress && (
-                      <div>
-                        <p className="mb-1 text-sm text-muted-foreground">
-                          Issuer Wallet Address
-                        </p>
-                        <p className="break-all rounded bg-muted/50 p-2 font-mono text-xs">
-                          {verificationResult.certificate.issuerAddress}
-                        </p>
-                      </div>
-                    )}
-
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-2 pt-2 border-t border-border/40">
                       {verificationResult.localData?.studentPhoto && (
                         <Dialog>
                           <DialogTrigger asChild>
@@ -487,24 +537,24 @@ export default function VerifyCertificate() {
                       )}
 
                       <Button
-                        variant="outline"
+                        variant="default"
                         size="sm"
-                        className="gap-2"
+                        className="gap-2 font-medium shadow-sm"
                         onClick={() => setShowCertificatePreview(true)}
                       >
                         <Eye className="h-4 w-4" />
-                        View Certificate
+                        View Certificate Document
                       </Button>
 
                       <Button
                         variant="outline"
                         size="sm"
-                        className="gap-2"
+                        className="gap-2 font-medium"
                         onClick={downloadPdfFromPreview}
                         disabled={isDownloadingPdf}
                       >
                         <Download className="h-4 w-4" />
-                        {isDownloadingPdf ? 'Downloading...' : 'Download PDF'}
+                        {isDownloadingPdf ? 'Generating PDF...' : 'Download PDF'}
                       </Button>
                     </div>
 
@@ -513,14 +563,16 @@ export default function VerifyCertificate() {
                     </Button>
                   </div>
                 ) : (
-                  <div className="py-6 text-center">
-                    <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10">
-                      <XCircle className="h-10 w-10 text-destructive" />
+                  <div className="py-6 text-center space-y-4">
+                    <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+                      <XCircle className="h-10 w-10" />
                     </div>
-                    <h3 className="mb-2 text-2xl font-bold text-destructive">✗ INVALID</h3>
-                    <p className="mb-4 text-muted-foreground">
-                      This certificate was NOT found on the blockchain. It may be invalid or forged.
-                    </p>
+                    <div>
+                      <h3 className="text-xl font-bold text-destructive">✗ UNVERIFIED / FORGED CREDENTIAL</h3>
+                      <p className="mt-1 text-sm text-muted-foreground max-w-md mx-auto">
+                        This certificate hash does not exist in the Ethereum smart contract registry. It may be altered, invalid, or never officially issued.
+                      </p>
+                    </div>
                     <Button onClick={resetVerification} variant="outline">
                       Try Another Certificate
                     </Button>
@@ -634,7 +686,7 @@ export default function VerifyCertificate() {
                     institution={getInstitution()}
                     issueDate={getIssueDateString()}
                     certificateHash={getCertificateHash()}
-                    issuerName="Yash Gayake"
+                    issuerName="Authorized Signatory"
                     issuerTitle="Registrar"
                   />
 

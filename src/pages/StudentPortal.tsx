@@ -620,7 +620,7 @@ export default function StudentPortal() {
                   institution={selectedCertificate.institution}
                   issueDate={selectedCertificate.issueDate}
                   certificateHash={selectedCertificate.certificateHash}
-                  issuerName="Yash Gayake"
+                  issuerName="Authorized Signatory"
                   issuerTitle="Registrar"
                 />
 

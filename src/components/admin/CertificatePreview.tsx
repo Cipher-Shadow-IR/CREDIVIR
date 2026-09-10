@@ -21,7 +21,7 @@ export const CertificatePreview = forwardRef<HTMLDivElement, CertificatePreviewP
       institution,
       issueDate,
       certificateHash,
-      issuerName = 'Yash Gayake',
+      issuerName = 'Authorized Signatory',
       issuerTitle = 'Registrar'
     },
     ref
@@ -93,10 +93,10 @@ export const CertificatePreview = forwardRef<HTMLDivElement, CertificatePreviewP
               style={{ boxSizing: 'border-box' }}
             >
               <div className="mb-3 flex justify-center">
-                <div className="flex h-14 w-14 items-center justify-center rounded-full border-4 border-[#6b2d2d] text-center">
+                <div className="flex h-14 w-14 items-center justify-center rounded-full border-4 border-[#1e3a8a] text-center">
                   <div className="leading-tight">
-                    <div className="text-lg font-bold text-[#6b2d2d]">BC</div>
-                    <div className="text-[8px] text-[#6b2d2d]">CHAIN</div>
+                    <div className="text-sm font-black text-[#1e3a8a]">CRD</div>
+                    <div className="text-[7px] font-bold text-[#1e3a8a]">VERIFIED</div>
                   </div>
                 </div>
               </div>
