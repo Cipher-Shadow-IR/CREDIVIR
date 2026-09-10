@@ -1,12 +1,14 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Shield, GraduationCap, CheckCircle2, Menu, X, ArrowUpRight } from 'lucide-react';
+import { Shield, GraduationCap, CheckCircle2, Menu, X, ArrowUpRight, Sun, Moon } from 'lucide-react';
 import { useState } from 'react';
+import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const { theme, setTheme } = useTheme();
 
   const navLinks = [
     { to: '/', label: 'Overview', icon: Shield },
@@ -20,9 +22,11 @@ export function Navbar() {
       <div className="container flex h-16 items-center justify-between">
         {/* Brand */}
         <Link to="/" className="flex items-center gap-3 group">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-600 via-indigo-700 to-blue-700 text-white shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform">
-            <Shield className="h-5 w-5" />
-          </div>
+          <img
+            src="/CREDIVIR_LOGO.png"
+            alt="CREDIVIR Logo"
+            className="h-9 w-9 object-contain group-hover:scale-105 transition-transform shrink-0"
+          />
           <div className="flex flex-col">
             <div className="flex items-center gap-2">
               <span className="text-lg font-bold tracking-tight text-foreground font-sans">CREDIVIR</span>
@@ -55,7 +59,7 @@ export function Navbar() {
           })}
         </div>
 
-        {/* Action Button & Ishaan Ray attribution */}
+        {/* Action Button & Ishaan Ray attribution & Theme Toggle */}
         <div className="hidden items-center gap-3 lg:flex">
           <a
             href="https://galaxir.vercel.app"
@@ -66,6 +70,23 @@ export function Navbar() {
             <span>by Ishaan Ray</span>
             <ArrowUpRight className="h-3 w-3" />
           </a>
+
+          {/* Light / Dark Mode Toggle */}
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            title={theme === 'dark' ? 'Switch to Light theme' : 'Switch to Dark theme'}
+            aria-label={theme === 'dark' ? 'Switch to Light theme' : 'Switch to Dark theme'}
+            className="h-9 w-9 border-border/80 bg-background/50 hover:bg-muted text-muted-foreground hover:text-foreground cursor-pointer"
+          >
+            {theme === 'dark' ? (
+              <Sun className="h-4 w-4 text-[#FBBF24] transition-transform hover:rotate-45" />
+            ) : (
+              <Moon className="h-4 w-4 text-[#1E40AF] transition-transform hover:-rotate-12" />
+            )}
+          </Button>
+
           <Button asChild size="sm" className="gap-2 shadow-sm font-medium">
             <Link to="/verify">
               <CheckCircle2 className="h-4 w-4" />
@@ -74,16 +95,30 @@ export function Navbar() {
           </Button>
         </div>
 
-        {/* Mobile Menu Button */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="md:hidden"
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          aria-label="Toggle menu"
-        >
-          {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </Button>
+        {/* Mobile Menu Button & Quick Theme Toggle */}
+        <div className="flex items-center gap-2 md:hidden">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            className="h-9 w-9 text-muted-foreground hover:text-foreground"
+            aria-label="Toggle theme"
+          >
+            {theme === 'dark' ? (
+              <Sun className="h-4 w-4 text-[#FBBF24]" />
+            ) : (
+              <Moon className="h-4 w-4 text-[#1E40AF]" />
+            )}
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-label="Toggle menu"
+          >
+            {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </Button>
+        </div>
       </div>
 
       {/* Mobile Navigation */}
@@ -110,6 +145,27 @@ export function Navbar() {
                 </Link>
               );
             })}
+            <div className="pt-2 border-t border-border/40 flex items-center justify-between">
+              <span className="text-xs font-mono text-muted-foreground uppercase">Theme</span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                className="gap-2 h-8 cursor-pointer"
+              >
+                {theme === 'dark' ? (
+                  <>
+                    <Sun className="h-3.5 w-3.5 text-[#FBBF24]" />
+                    <span className="text-xs">Light Mode</span>
+                  </>
+                ) : (
+                  <>
+                    <Moon className="h-3.5 w-3.5 text-[#1E40AF]" />
+                    <span className="text-xs">Dark Mode</span>
+                  </>
+                )}
+              </Button>
+            </div>
             <div className="pt-2 border-t border-border/40 flex items-center justify-between">
               <a
                 href="https://galaxir.vercel.app"

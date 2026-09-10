@@ -12,14 +12,19 @@ import {
   Fingerprint,
   Cpu,
   Globe2,
-  ExternalLink,
   Sparkles,
-  QrCode
+  QrCode,
+  ShieldCheck,
+  Database,
+  FileBadge
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Navbar } from '@/components/Navbar';
+import { CountUp } from '@/components/CountUp';
+import { Reveal } from '@/components/Reveal';
+import { Marquee } from '@/components/Marquee';
 
 const Index = () => {
   const [heroInput, setHeroInput] = useState('');
@@ -112,270 +117,290 @@ const Index = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col selection:bg-primary/20">
+    <div className="min-h-screen bg-background text-foreground flex flex-col selection:bg-primary/20 overflow-x-hidden">
       <Navbar />
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden border-b border-border/40 py-20 md:py-28 bg-gradient-to-b from-primary/5 via-background to-background">
+      {/* Hero Section with Floating Tilted UI Cards */}
+      <section className="relative overflow-hidden border-b border-border/40 py-14 sm:py-16 md:py-24 bg-gradient-to-b from-primary/5 via-background to-background">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-20%,rgba(99,102,241,0.15),rgba(255,255,255,0))]" />
-        <div className="container relative mx-auto px-4">
-          <div className="mx-auto max-w-4xl text-center">
-            {/* Protocol Badge */}
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-1.5 text-xs font-mono font-medium text-primary backdrop-blur-md">
-              <Sparkles className="h-3.5 w-3.5" />
-              <span>CREDIVIR PROTOCOL • ETHEREUM IMMUTABLE ATTESTATION</span>
-            </div>
+        
+        {/* Subtle Ambient Blobs */}
+        <div className="pointer-events-none absolute -left-20 top-20 h-72 w-72 rounded-full bg-blue-500/10 blur-3xl animate-float-slow" />
+        <div className="pointer-events-none absolute -right-20 top-40 h-80 w-80 rounded-full bg-indigo-500/10 blur-3xl animate-float-slower" />
 
-            {/* Headline */}
-            <h1 className="mb-6 text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-              Cryptographically Validated
-              <br />
-              <span className="bg-gradient-to-r from-indigo-500 via-blue-500 to-cyan-400 bg-clip-text text-transparent">
-                Academic Credentials
-              </span>
-            </h1>
-
-            <p className="mx-auto mb-10 max-w-2xl text-base sm:text-lg text-muted-foreground leading-relaxed">
-              Eliminate credential fraud with decentralized on-chain verification. CREDIVIR seals
-              academic certificates directly onto Ethereum smart contracts for instant, zero-trust validation anywhere in the world.
-            </p>
-
-            {/* HERO INSTANT VERIFICATION BAR */}
-            <div className="mx-auto mb-8 max-w-2xl">
-              <form
-                onSubmit={handleQuickVerify}
-                className="relative flex flex-col sm:flex-row items-center gap-2 rounded-2xl border border-border/80 bg-card/90 p-2 shadow-2xl backdrop-blur-xl focus-within:border-primary/60 transition-all"
-              >
-                <div className="flex w-full items-center gap-2 pl-3">
-                  <Search className="h-5 w-5 text-muted-foreground shrink-0" />
-                  <Input
-                    type="text"
-                    value={heroInput}
-                    onChange={(e) => setHeroInput(e.target.value)}
-                    placeholder="Enter Certificate Hash or Verify URL..."
-                    className="border-0 bg-transparent font-mono text-sm placeholder:text-muted-foreground/70 focus-visible:ring-0 focus-visible:ring-offset-0 px-1 shadow-none"
-                  />
+        <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 relative">
+          <div className="grid lg:grid-cols-12 gap-12 items-center">
+            
+            {/* Left Column: Heading & Interaction (Col 7) */}
+            <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
+              {/* Protocol Badge */}
+              <Reveal direction="up" className="inline-flex">
+                <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3.5 py-1 text-xs font-mono font-medium text-primary backdrop-blur-md">
+                  <Sparkles className="h-3.5 w-3.5" />
+                  <span>CREDIVIR PROTOCOL • ETHEREUM IMMUTABLE ATTESTATION</span>
                 </div>
-                <Button
-                  type="submit"
-                  size="default"
-                  className="w-full sm:w-auto shrink-0 gap-2 font-medium px-6 shadow-md bg-primary hover:bg-primary/90"
+              </Reveal>
+
+              {/* Disciplined Scale Headline */}
+              <Reveal direction="up" delay={90}>
+                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.1] text-foreground">
+                  Cryptographically Validated
+                  <br />
+<span className="bg-gradient-to-r from-indigo-600 via-blue-600 to-cyan-600 bg-clip-text text-transparent dark:from-indigo-400 dark:via-blue-500 dark:to-cyan-400">
+                  Academic Credentials
+                </span>
+                </h1>
+              </Reveal>
+
+              <Reveal direction="up" delay={180}>
+                <p className="max-w-2xl text-sm sm:text-base text-muted-foreground leading-relaxed font-normal">
+                  Eliminate credential fraud with decentralized on-chain verification. CREDIVIR seals
+                  academic certificates directly onto Ethereum smart contracts for instant, zero-trust validation anywhere in the world.
+                </p>
+              </Reveal>
+
+              <Reveal direction="up" delay={270}>
+              {/* HERO INSTANT VERIFICATION BAR */}
+              <div className="pt-2 max-w-xl">
+                <form
+                  onSubmit={handleQuickVerify}
+                  className="relative flex flex-col sm:flex-row items-center gap-2 rounded-xl border border-border/80 bg-card/90 p-2 shadow-xl backdrop-blur-xl focus-within:border-primary/60 transition-all"
                 >
-                  <CheckCircle2 className="h-4 w-4" />
-                  <span>Verify Now</span>
-                </Button>
-              </form>
-
-              {/* Sample Hashes */}
-              <div className="mt-3 flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground">
-                <span className="font-mono">Quick test samples:</span>
-                {sampleHashes.map((s) => (
-                  <button
-                    key={s.label}
-                    type="button"
-                    onClick={() => {
-                      setHeroInput(s.hash);
-                      navigate(`/verify?hash=${s.hash}`);
-                    }}
-                    className="inline-flex items-center gap-1 rounded-md border border-border/60 bg-muted/40 px-2 py-0.5 font-mono hover:bg-muted hover:text-foreground transition-colors"
+                  <div className="flex w-full items-center gap-2 pl-3">
+                    <Search className="h-4 w-4 text-muted-foreground shrink-0" />
+                    <Input
+                      type="text"
+                      value={heroInput}
+                      onChange={(e) => setHeroInput(e.target.value)}
+                      placeholder="Enter Certificate Hash or Verify URL..."
+                      className="border-0 bg-transparent font-mono text-xs sm:text-sm placeholder:text-muted-foreground/70 focus-visible:ring-0 focus-visible:ring-offset-0 px-1 shadow-none"
+                    />
+                  </div>
+                  <Button
+                    type="submit"
+                    size="default"
+                    className="w-full sm:w-auto shrink-0 gap-2 font-medium px-5 text-xs shadow-md bg-primary hover:bg-primary/90"
                   >
-                    <span>{s.label}</span>
-                  </button>
-                ))}
+                    <CheckCircle2 className="h-4 w-4" />
+                    <span>Verify Now</span>
+                  </Button>
+                </form>
+
+                {/* Sample Hashes */}
+                <div className="mt-3 flex flex-wrap items-center justify-center lg:justify-start gap-2 text-xs text-muted-foreground">
+                  <span className="font-mono text-[11px]">Quick test samples:</span>
+                  {sampleHashes.map((s) => (
+                    <button
+                      key={s.label}
+                      type="button"
+                      onClick={() => {
+                        setHeroInput(s.hash);
+                        navigate(`/verify?hash=${s.hash}`);
+                      }}
+                      className="inline-flex items-center gap-1 rounded-md border border-border/60 bg-muted/40 px-2 py-0.5 font-mono text-[11px] hover:bg-muted hover:text-foreground transition-colors cursor-pointer"
+                    >
+                      <span>{s.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              </Reveal>
+
+              {/* Quick Metrics Bar with Animated Counters */}
+              <Reveal direction="up" delay={340}>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6 border-t border-border/40 text-left">
+                <div className="space-y-0.5">
+                  <p className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground">Credentials Sealed</p>
+                  <p className="text-sm sm:text-base font-bold text-foreground">
+                    <CountUp end={18420} suffix="+" />
+                  </p>
+                </div>
+                <div className="space-y-0.5">
+                  <p className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground">Hashing Digest</p>
+                  <p className="text-sm sm:text-base font-bold text-foreground">Keccak256</p>
+                </div>
+                <div className="space-y-0.5">
+                  <p className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground">Verify Latency</p>
+                  <p className="text-sm sm:text-base font-bold text-foreground">
+                    &lt; <CountUp end={320} suffix="ms" />
+                  </p>
+                </div>
+                <div className="space-y-0.5">
+                  <p className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground">Tamper Protection</p>
+                  <p className="text-sm sm:text-base font-bold text-foreground">
+                    <CountUp end={100} suffix="% On-Chain" />
+                  </p>
+                </div>
+              </div>
+              </Reveal>
+            </div>
+
+            {/* Right Column: Floating Tilted Cryptographic UI Cards (Col 5) */}
+            <div className="lg:col-span-5 relative h-[380px] sm:h-[420px] flex items-center justify-center min-w-0">
+              <div className="relative w-full max-w-sm h-full">
+                
+                {/* Floating Card 1: Verified On-Chain Attestation */}
+                <div className="absolute left-[2%] top-[10%] w-[88%] rounded-2xl border border-primary/30 bg-card/90 p-5 shadow-2xl backdrop-blur-xl animate-float-slow z-20">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-400">
+                        <ShieldCheck className="h-4 w-4" />
+                      </div>
+                      <span className="text-xs font-bold text-foreground">CRYPTOGRAPHIC SEAL</span>
+                    </div>
+                    <span className="rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 font-mono text-[10px] text-emerald-400 font-semibold uppercase">
+                      Active On-Chain
+                    </span>
+                  </div>
+
+                  <div className="mt-4 space-y-1.5">
+                    <p className="text-xs font-semibold text-foreground">B.Sc. in Computer Science & Systems</p>
+                    <p className="text-[11px] font-mono text-muted-foreground">Recipient: Alex Rivera (ID: 2024-CS-091)</p>
+                    <div className="rounded-lg bg-muted/50 p-2 font-mono text-[10px] text-primary break-all border border-border/50">
+                      0x8f2d5e1b9c3a4f7e2d1c0b8a7f6e5d4c3b2a1098
+                    </div>
+                  </div>
+
+                  <div className="mt-3 flex items-center justify-between pt-2.5 border-t border-border/40 text-[10px] font-mono text-muted-foreground">
+                    <span>Block: #19482104</span>
+                    <span className="text-emerald-400 font-semibold">100% Authentic</span>
+                  </div>
+                </div>
+
+                {/* Floating Card 2: IPFS Document Vault */}
+                <div className="absolute right-[0%] top-[4%] w-[68%] rounded-xl border border-border/80 bg-card/95 p-4 shadow-xl backdrop-blur-xl animate-float-slower z-30">
+                  <div className="flex items-center gap-2">
+                    <Database className="h-4 w-4 text-blue-400" />
+                    <span className="text-xs font-mono font-medium text-foreground">IPFS Pinning</span>
+                  </div>
+                  <p className="mt-1 text-[10px] font-mono text-muted-foreground truncate">
+                    QmXoypizjW3WknFiJnKLwHCn...
+                  </p>
+                  <div className="mt-2 flex items-center justify-between text-[10px] font-mono text-emerald-400">
+                    <span>Immutability check</span>
+                    <span className="font-bold">VERIFIED</span>
+                  </div>
+                </div>
+
+                {/* Floating Card 3: Dual QR Scan Attestation */}
+                <div className="absolute left-[12%] bottom-[6%] w-[72%] rounded-xl border border-indigo-500/30 bg-card/90 p-4 shadow-xl backdrop-blur-xl animate-float z-10">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <QrCode className="h-4 w-4 text-indigo-400" />
+                      <span className="text-xs font-semibold text-foreground">Dual-Scan QR</span>
+                    </div>
+                    <span className="text-[10px] font-mono text-indigo-400">EIP-712</span>
+                  </div>
+                  <p className="mt-1 text-[10px] text-muted-foreground">Physical & digital transcript validation</p>
+                </div>
+
               </div>
             </div>
 
-            {/* Quick Metrics Bar */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto pt-6 border-t border-border/40 text-left">
-              <div className="space-y-1">
-                <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground">Architecture</p>
-                <p className="text-sm font-semibold">Decentralized EVM</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground">Hashing Digest</p>
-                <p className="text-sm font-semibold">Keccak256 / SHA-256</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground">Verification Latency</p>
-                <p className="text-sm font-semibold">&lt; 350ms Direct Query</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground">Audit Model</p>
-                <p className="text-sm font-semibold">100% Zero-Trust Proof</p>
-              </div>
-            </div>
           </div>
         </div>
       </section>
 
-      {/* Portals Section */}
-      <section className="py-20 bg-card/20">
-        <div className="container mx-auto px-4">
-          <div className="mx-auto max-w-2xl text-center mb-14">
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Dedicated Access Portals</h2>
-            <p className="mt-2 text-muted-foreground text-sm sm:text-base">
-              Segmented environments designed for verification parties, graduate recipients, and authorized registrars.
-            </p>
-          </div>
+      {/* Infinite Marquee Ticker */}
+      <Marquee />
 
-          <div className="grid gap-6 md:grid-cols-3 max-w-6xl mx-auto">
+      {/* Portals Section */}
+      <section className="py-16 sm:py-20 bg-card/20 border-b border-border/40">
+        <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+          <Reveal>
+            <div className="mx-auto max-w-2xl text-center mb-12 space-y-2">
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Dedicated Access Portals</h2>
+              <p className="text-muted-foreground text-xs sm:text-sm">
+                Segmented environments designed for verification parties, graduate recipients, and authorized registrars.
+              </p>
+            </div>
+          </Reveal>
+
+          <div className="grid gap-6 md:grid-cols-3 max-w-5xl mx-auto">
             {portals.map((portal, index) => {
               const Icon = portal.icon;
               return (
-                <Card
-                  key={index}
-                  className="relative overflow-hidden border-border/60 bg-card/60 backdrop-blur-sm transition-all duration-300 hover:border-primary/40 hover:shadow-xl hover:-translate-y-1 flex flex-col justify-between"
-                >
-                  <CardHeader className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${portal.color} text-white shadow-md`}>
-                        <Icon className="h-6 w-6" />
+                <Reveal key={index} delay={index * 120}>
+                  <Card className="h-full relative overflow-hidden border-border/60 bg-card/60 backdrop-blur-sm transition-all duration-300 hover:border-primary/40 hover:shadow-xl hover:-translate-y-1 flex flex-col justify-between">
+                    <CardHeader className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className={`flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${portal.color} text-white shadow-md`}>
+                          <Icon className="h-5 w-5" />
+                        </div>
+                        <span className="text-[11px] font-mono px-2 py-0.5 rounded-md border border-border/80 bg-muted/60 text-muted-foreground">
+                          {portal.badge}
+                        </span>
                       </div>
-                      <span className="text-[11px] font-mono px-2 py-0.5 rounded-full border border-border/80 bg-muted/60 text-muted-foreground">
-                        {portal.badge}
-                      </span>
-                    </div>
-                    <div>
-                      <CardTitle className="text-xl font-bold">{portal.title}</CardTitle>
-                      <CardDescription className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                        {portal.description}
-                      </CardDescription>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <Button asChild variant="outline" className="w-full justify-between group">
-                      <Link to={portal.to}>
-                        <span>{portal.actionText}</span>
-                        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                      <div>
+                        <CardTitle className="text-lg font-bold">{portal.title}</CardTitle>
+                        <CardDescription className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                          {portal.description}
+                        </CardDescription>
+                      </div>
+                    </CardHeader>
+
+                    <CardContent className="pt-0">
+                      <Link to={portal.to} className="w-full block">
+                        <Button variant="outline" className="w-full justify-between group text-xs">
+                          <span>{portal.actionText}</span>
+                          <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1 text-primary" />
+                        </Button>
                       </Link>
-                    </Button>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+                </Reveal>
               );
             })}
           </div>
         </div>
       </section>
 
-      {/* Architecture & Enterprise Features */}
-      <section className="py-20 border-t border-border/40">
-        <div className="container mx-auto px-4">
-          <div className="mx-auto max-w-2xl text-center mb-14">
-            <div className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-widest text-primary mb-2">
-              <Shield className="h-3.5 w-3.5" />
-              <span>Protocol Capabilities</span>
+      {/* Protocol Features */}
+      <section className="py-16 sm:py-20">
+        <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
+          <Reveal>
+            <div className="mx-auto max-w-2xl text-center space-y-2">
+              <span className="text-xs font-mono font-semibold uppercase tracking-wider text-primary">
+                Core Architecture
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Institutional Trust Primitives</h2>
+              <p className="text-muted-foreground text-xs sm:text-sm">
+                Purpose-built cryptography and decentralized protocols ensuring credentials can never be altered, forged, or lost.
+              </p>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
-              Enterprise Grade Cryptographic Attestation
-            </h2>
-            <p className="mt-2 text-muted-foreground text-sm sm:text-base">
-              Engineered with Ethereum state storage, cryptographic SHA-256 integrity, and IPFS persistence.
-            </p>
-          </div>
+          </Reveal>
 
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 max-w-5xl mx-auto">
             {features.map((feature, index) => {
               const Icon = feature.icon;
               return (
-                <div
-                  key={index}
-                  className="rounded-2xl border border-border/50 bg-card/40 p-6 transition-all hover:border-primary/30 hover:bg-card/70"
-                >
-                  <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                    <Icon className="h-5 w-5" />
+                <Reveal key={index} delay={index * 80}>
+                  <div className="rounded-xl border border-border/60 bg-card/40 p-6 space-y-3 transition-all duration-300 hover:border-primary/40 hover:bg-card/70 h-full">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 border border-primary/20 text-primary">
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <h3 className="text-base font-semibold text-foreground">{feature.title}</h3>
+                    <p className="text-xs leading-relaxed text-muted-foreground">{feature.description}</p>
                   </div>
-                  <h3 className="mb-2 text-base font-semibold text-foreground">{feature.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
-                </div>
+                </Reveal>
               );
             })}
           </div>
         </div>
       </section>
 
-      {/* Verification Workflow */}
-      <section className="py-20 bg-muted/20 border-t border-border/40">
-        <div className="container mx-auto px-4">
-          <div className="mx-auto max-w-3xl text-center mb-12">
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">How CREDIVIR Verification Operates</h2>
-            <p className="mt-2 text-muted-foreground text-sm">
-              Three deterministic steps guarantee mathematical certainty of authenticity.
-            </p>
+      {/* Footer */}
+      <footer className="mt-auto border-t border-border/40 bg-card/40 py-8 text-xs text-muted-foreground">
+        <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <Shield className="h-4 w-4 text-primary" />
+            <span className="font-semibold text-foreground">CREDIVIR Protocol</span>
+            <span>• Ethereum Immutable Attestation</span>
           </div>
-
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            <div className="relative rounded-xl border border-border/60 bg-card/80 p-6 space-y-3">
-              <span className="font-mono text-xs font-bold text-primary px-2 py-0.5 rounded bg-primary/10">STEP 01</span>
-              <h4 className="font-semibold text-base">Hash Generation</h4>
-              <p className="text-sm text-muted-foreground">
-                Institution combines recipient name, course, issuance date, and unique serial into an irreversible SHA-256 digest.
-              </p>
-            </div>
-            <div className="relative rounded-xl border border-border/60 bg-card/80 p-6 space-y-3">
-              <span className="font-mono text-xs font-bold text-primary px-2 py-0.5 rounded bg-primary/10">STEP 02</span>
-              <h4 className="font-semibold text-base">On-Chain Anchoring</h4>
-              <p className="text-sm text-muted-foreground">
-                Registrar smart contract records the hash along with issuer public address and metadata into Ethereum state.
-              </p>
-            </div>
-            <div className="relative rounded-xl border border-border/60 bg-card/80 p-6 space-y-3">
-              <span className="font-mono text-xs font-bold text-primary px-2 py-0.5 rounded bg-primary/10">STEP 03</span>
-              <h4 className="font-semibold text-base">Zero-Trust Verification</h4>
-              <p className="text-sm text-muted-foreground">
-                Third parties query the contract view function or scan the physical QR code to cross-verify against live ledger state.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Modernized Portfolio Footer */}
-      <footer className="mt-auto border-t border-border/60 bg-card/40 py-12">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
-                <Shield className="h-5 w-5" />
-              </div>
-              <div>
-                <span className="font-bold text-foreground tracking-tight">CREDIVIR</span>
-                <span className="text-xs text-muted-foreground block">On-Chain Credential Attestation Protocol</span>
-              </div>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
-              <Link to="/verify" className="hover:text-foreground transition-colors">Verify Certificate</Link>
-              <Link to="/student" className="hover:text-foreground transition-colors">Student Portal</Link>
-              <Link to="/admin" className="hover:text-foreground transition-colors">Admin Portal</Link>
-              <a
-                href="https://galaxir.vercel.app"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 font-mono text-xs text-primary hover:underline"
-              >
-                Portfolio
-                <ExternalLink className="h-3 w-3" />
-              </a>
-              <a
-                href="https://github.com/Cipher-Shadow-IR"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 font-mono text-xs text-primary hover:underline"
-              >
-                GitHub
-                <ExternalLink className="h-3 w-3" />
-              </a>
-            </div>
-          </div>
-
-          <div className="mt-8 pt-6 border-t border-border/40 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
-            <p>
-              Designed & Engineered by <a href="https://galaxir.vercel.app" target="_blank" rel="noopener noreferrer" className="font-semibold text-foreground hover:underline">Ishaan Ray</a> • Blockchain Systems Engineer
-            </p>
-            <p className="font-mono">
-              Ethereum Smart Contract • Solidity • Ethers.js • React • IPFS
-            </p>
-          </div>
+          <p>© {new Date().getFullYear()} CREDIVIR. Open Source Academic Blockchain Protocol.</p>
+          <p className="font-medium text-foreground/80">
+            Designed & Developed by <span className="font-semibold text-primary">ISHAAN RAY</span>
+          </p>
         </div>
       </footer>
     </div>

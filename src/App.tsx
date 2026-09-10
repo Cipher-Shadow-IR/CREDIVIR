@@ -5,6 +5,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { BlockchainProvider } from "@/contexts/BlockchainContext";
 import { AppProvider } from "@/contexts/AppContext";
+import { PageTransition } from "@/components/PageTransition";
+import { ScrollToTop } from "@/components/ScrollToTop";
+import { CredivirPreloader } from "@/components/CredivirPreloader";
 import Index from "./pages/Index";
 import AdminPortal from "./pages/AdminPortal";
 import StudentPortal from "./pages/StudentPortal";
@@ -20,13 +23,50 @@ const App = () => (
         <AppProvider>
           <Toaster />
           <Sonner />
+          <CredivirPreloader />
           <BrowserRouter>
+            <ScrollToTop />
             <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/admin" element={<AdminPortal />} />
-              <Route path="/student" element={<StudentPortal />} />
-              <Route path="/verify" element={<VerifyCertificate />} />
-              <Route path="*" element={<NotFound />} />
+              <Route
+                path="/"
+                element={
+                  <PageTransition>
+                    <Index />
+                  </PageTransition>
+                }
+              />
+              <Route
+                path="/admin"
+                element={
+                  <PageTransition>
+                    <AdminPortal />
+                  </PageTransition>
+                }
+              />
+              <Route
+                path="/student"
+                element={
+                  <PageTransition>
+                    <StudentPortal />
+                  </PageTransition>
+                }
+              />
+              <Route
+                path="/verify"
+                element={
+                  <PageTransition>
+                    <VerifyCertificate />
+                  </PageTransition>
+                }
+              />
+              <Route
+                path="*"
+                element={
+                  <PageTransition>
+                    <NotFound />
+                  </PageTransition>
+                }
+              />
             </Routes>
           </BrowserRouter>
         </AppProvider>

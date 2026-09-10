@@ -1,190 +1,135 @@
-# 🎓 Blockchain Certificate Verification System
+<p align="center">
+  <img src="public/CREDIVIR_LOGO.png" alt="CREDIVIR Logo" width="160" />
+</p>
 
-A **Blockchain-based Certificate Verification Platform** that allows educational institutions to securely issue and verify certificates using **Ethereum blockchain technology**.
+<p align="center">
+  <img src="https://img.shields.io/badge/CREDIVIR-Blockchain%20Verification-6366f1?style=for-the-badge&logo=ethereum" alt="CREDIVIR Banner" />
+</p>
 
-This system prevents **fake certificates**, ensures **tamper-proof records**, and enables **instant verification** of academic credentials.
+<p align="center">
+  <img src="https://readme-typing-svg.herokuapp.com?font=Plus+Jakarta+Sans&size=32&duration=4000&color=6366F1&center=true&vCenter=true&width=1000&height=70&lines=CREDIVIR+%7C+Enterprise+Blockchain+Credential+Sealing;Instant+Keccak256+Hash+Verification+%7C+Zero-Trust" alt="Typing SVG" />
+</p>
+
+<h2 align="center">🛡️ Enterprise Blockchain Certificate Issuance & Verification Protocol.</h2>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Status-Active-success?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Version-2.4.0-blue?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/TypeScript-Strict-blue?style=for-the-badge&logo=typescript" />
+  <img src="https://img.shields.io/badge/Built%20With-React%20%7C%20Vite%20%7C%20Tailwind-black?style=for-the-badge" />
+</p>
+
+---
+> *"On-Chain Credential Attestation & Instant Tamper-Evident Verification."*  
+> **CREDIVIR** is an enterprise-grade cryptographic credential verification platform.  
+> Built with **React 18**, **TypeScript**, **Vite**, **Tailwind CSS**, and **Ethers.js** for permanent, tamper-proof academic record sealing on Ethereum smart contracts.
 
 ---
 
-# 👨‍💻 Developer
+# ✨ Features
 
-**Yash Gayake**
-Diploma in Computer Engineering Student
-Blockchain • Full Stack Development • AI/ML Enthusiast
-
-GitHub: https://github.com/yashgayake
-
----
-
-# 🚀 Features
-
-### 🔐 Admin Portal
-
-* MetaMask wallet authentication
-* Smart contract connection
-* Register new students
-* Issue blockchain-based certificates
-* View all student and certificate records
-
-### 🎓 Student Portal
-
-* Student login using enrollment number
-* View issued certificates
-* Secure certificate access
-
-### 🔍 Certificate Verification
-
-* Verify certificate authenticity
-* Blockchain validation
-* Prevent fake certificates
-
-### ⛓ Blockchain Integration
-
-* Ethereum Smart Contract
-* MetaMask wallet connection
-* Ganache local blockchain network
-* Immutable certificate records
+- 📜 **Cryptographic Certificate Sealing** — Anchors unique Keccak256 diploma hashes directly onto the blockchain.
+- 🔍 **Instant Verification Engine** — Drag-and-drop certificate files or input hash string to verify authenticity in real-time.
+- 🎓 **Student Portal** — View issued credentials, verified issue timestamps, and download authentic cryptographically sealed badges.
+- 👑 **Admin Issuance Portal** — Authorize educational institutions, batch-issue credentials, and manage verification registries.
+- ⚡ **Interactive Telemetry** — CountUp statistics, floating proof cards, infinite ticker marquee, and animated verification loader.
+- 🌙 **Theme Switcher** — Seamless light and dark mode toggling with persistent user preference storage.
+- 🛡️ **Zero-Trust Security** — Prevents diploma forgery, fraudulent claims, and retroactive document tampering.
 
 ---
 
-# 🛠 Tech Stack
+# 💡 Why This Project?
 
-Frontend
+This platform demonstrates:
 
-* React
-* TypeScript
-* Vite
-* Tailwind CSS
+- **Immutable Data Registry**: Storing digital fingerprint hashes on Ethereum to guarantee lifelong validity.
+- **Enterprise UX/UI**: Clean data hierarchy, status badges, toast feedback, and skeleton loaders.
+- **TypeScript Architecture**: Strict type checking for web3 contract interfaces, certificate payloads, and state models.
 
-Blockchain
+---
 
-* Solidity
-* Ethereum
-* Ethers.js
-* MetaMask
-* Ganache
+# 🧩 Tech Stack
 
-Development Tools
-
-* VS Code
-* Git & GitHub
-* Remix IDE
+| Layer | Technology |
+|-------|-----------|
+| Frontend | React 18, Vite 5, TypeScript, Tailwind CSS 3 |
+| State & Theme | Lucide React, Next Themes, Framer Motion |
+| Web3 Integration | Ethers.js, MetaMask Web3 Provider |
+| Design System | Radix UI Primitives, Lucide Icons |
 
 ---
 
 # 📂 Project Structure
 
-```
-src
- ├─ components
- │   ├─ admin
- │   │   ├─ RegisterStudent.tsx
- │   │   ├─ IssueCertificate.tsx
- │   │   └─ ViewAllRecords.tsx
- │
- ├─ contexts
- │   ├─ BlockchainContext.tsx
- │   └─ AppContext.tsx
- │
- ├─ lib
- │   └─ blockchain.ts
- │
- ├─ pages
- │   ├─ AdminPortal.tsx
- │   ├─ StudentPortal.tsx
- │   └─ VerifyCertificate.tsx
+```plaintext
+Certificate Verification/
+├── public/
+│   └── CREDIVIR_LOGO.png        # Official CREDIVIR Brand Asset
+├── src/
+│   ├── components/              # Navbar, CredivirLoader, CountUp, Marquee, NavLink, etc.
+│   │   ├── admin/               # IssueCertificate, RegisterStudent, ViewAllRecords, Analytics
+│   │   └── ui/                  # Radix UI primitives & buttons
+│   ├── pages/                   # Index (Overview), Verify, StudentPortal, AdminPortal
+│   ├── lib/                     # Utility functions and Web3 helpers
+│   ├── App.tsx                  # Root application component
+│   └── main.tsx                 # Vite entry point
+├── index.html
+├── package.json
+└── tsconfig.json
 ```
 
 ---
 
-# ⚙️ Installation & Setup
+# ⚙️ Installation & Local Setup
 
-## 1️⃣ Clone the repository
+### Prerequisites
+- Node.js 18+
 
-```bash
-git clone https://github.com/yashgayake/blockchain-certificate-verification.git
-```
-
-## 2️⃣ Open project
+### 1. Install Dependencies
 
 ```bash
-cd blockchain-certificate-verification
-```
+# Clone repository
+git clone https://github.com/Cipher-Shadow-IR/CREDIVIR-Certificate-Verification.git
+cd "Certificate Verification"
 
-## 3️⃣ Install dependencies
-
-```bash
+# Install node modules
 npm install
 ```
 
-## 4️⃣ Start development server
+### 2. Run Development Server
 
 ```bash
 npm run dev
 ```
 
----
+Open [http://localhost:5173](http://localhost:5173).
 
-# ⛓ Blockchain Setup
+### 3. Production Build
 
-### 1️⃣ Start Ganache
-
-Run Ganache and create a local blockchain network.
-
-### 2️⃣ Deploy Smart Contract
-
-Deploy the certificate smart contract using **Remix IDE**.
-
-### 3️⃣ Update Contract Address
-
-Update the deployed contract address inside:
-
-```
-src/lib/blockchain.ts
-```
-
-### 4️⃣ Connect MetaMask
-
-Add Ganache network to MetaMask:
-
-```
-Network Name: Ganache Local
-RPC URL: http://127.0.0.1:7545
-Chain ID: 1337
-Currency Symbol: ETH
+```bash
+npm run build
 ```
 
 ---
 
-# 🧪 System Workflow
+# 💬 Author
 
-1️⃣ Admin connects MetaMask wallet
-2️⃣ Admin registers student on blockchain
-3️⃣ Admin issues certificate
-4️⃣ Certificate stored securely on blockchain
-5️⃣ Student can view certificates
-6️⃣ Anyone can verify certificate authenticity
-
----
-
-# 📌 Future Improvements
-
-* QR Code based certificate verification
-* IPFS certificate storage
-* Email notification system
-* Mobile responsive improvements
-* Multi-institution support
+<p align="center">
+  <b>Designed & Developed by Ishaan Ray (Cipher Shadow)</b><br>
+  <i>"On-Chain Credential Attestation & Instant Verification."</i><br><br>
+  <a href="https://github.com/Cipher-Shadow-IR" target="_blank">
+    <img src="https://img.shields.io/badge/GitHub-Cipher%20Shadow-181717?style=for-the-badge&logo=github" />
+  </a>
+  <a href="https://linkedin.com/in/ishaan-ray-cs" target="_blank">
+    <img src="https://img.shields.io/badge/LinkedIn-Ishaan%20Ray-0A66C2?style=for-the-badge&logo=linkedin" />
+  </a>
+  <a href="https://galaxir.vercel.app/" target="_blank">
+    <img src="https://img.shields.io/badge/Portfolio-Galaxir-6366F1?style=for-the-badge" />
+  </a>
+</p>
 
 ---
 
 # 📜 License
 
-This project is created for **educational and research purposes**.
-
----
-
-# ⭐ Author
-
-**Yash Gayake**
-
-If you like this project, feel free to **star the repository ⭐**
+MIT License © Ishaan Ray
