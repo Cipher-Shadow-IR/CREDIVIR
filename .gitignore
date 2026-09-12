@@ -33,9 +33,16 @@ dist-ssr/
 
 # Environment variables
 .env
-.env.production
-.env.local
-.env.*.local
+.env.*
+!.env.example
+
+# Private keys & credentials
+*.pem
+*.key
+*.p12
+*.pfx
+service-account*.json
+credentials*.json
 
 # Vercel
 .vercel
