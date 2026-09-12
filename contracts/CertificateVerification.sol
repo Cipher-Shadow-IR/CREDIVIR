@@ -3,6 +3,8 @@ pragma solidity ^0.8.19;
 
 contract CertificateVerification {
     address public admin;
+    mapping(address => bool) private admins;
+    address[] private allAdmins;
     uint256 public totalCertificates;
 
     struct Certificate {
@@ -62,13 +64,36 @@ contract CertificateVerification {
     );
 
     modifier onlyAdmin() {
-        require(msg.sender == admin, "Access denied: Only admin can perform this action");
+        require(admins[msg.sender], "Access denied: Only admin can perform this action");
         _;
     }
 
     constructor() {
         admin = msg.sender;
+        admins[msg.sender] = true;
+        allAdmins.push(msg.sender);
         totalCertificates = 0;
+    }
+
+    function addAdmin(address _newAdmin) public onlyAdmin {
+        require(_newAdmin != address(0), "Invalid admin address");
+        require(!admins[_newAdmin], "Already an admin");
+        admins[_newAdmin] = true;
+        allAdmins.push(_newAdmin);
+    }
+
+    function removeAdmin(address _adminAddress) public onlyAdmin {
+        require(_adminAddress != admin, "Cannot remove the primary admin");
+        require(admins[_adminAddress], "Not an admin");
+        admins[_adminAddress] = false;
+    }
+
+    function getAllAdmins() public view returns (address[] memory) {
+        return allAdmins;
+    }
+
+    function isAdminAddress(address _address) public view returns (bool) {
+        return admins[_address];
     }
 
     function registerStudent(
@@ -239,7 +264,7 @@ contract CertificateVerification {
     }
 
     function isAdmin() public view returns (bool) {
-        return msg.sender == admin;
+        return admins[msg.sender];
     }
 
     function isCertificateNumberExists(string memory _certificateNumber) public view returns (bool) {

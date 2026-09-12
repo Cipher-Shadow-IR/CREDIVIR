@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 
 import AnalyticsDashboard from '@/components/admin/AnalyticsDashboard';
+import { ManageAdmins } from '@/components/admin/ManageAdmins';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -33,9 +34,9 @@ import { useToast } from '@/hooks/use-toast';
 import { RegisterStudent } from '@/components/admin/RegisterStudent';
 import { IssueCertificate } from '@/components/admin/IssueCertificate';
 import { ViewAllRecords } from '@/components/admin/ViewAllRecords';
-import { DEFAULT_CONTRACT_ADDRESS, ADMIN_WALLET_ADDRESS } from '@/lib/blockchain';
+import { DEFAULT_CONTRACT_ADDRESS } from '@/lib/blockchain';
 
-type AdminAction = 'register' | 'issue' | 'records' | null;
+type AdminAction = 'register' | 'issue' | 'records' | 'admins' | null;
 
 interface DashboardCertificate {
   certificateHash: string;
@@ -274,6 +275,12 @@ export default function AdminPortal() {
       icon: List,
       title: 'View All Records',
       description: 'Browse all issued certificates and student records'
+    },
+    {
+      id: 'admins' as const,
+      icon: Users,
+      title: 'Manage Admins',
+      description: 'Add or remove admin wallets for authorized access'
     }
   ];
 
@@ -396,22 +403,17 @@ export default function AdminPortal() {
               <CardContent className="space-y-4">
                 <div className="space-y-2 rounded-lg bg-muted p-4">
                   <p className="text-sm text-muted-foreground">
-                    <strong>Connected Wallet:</strong>
+                    <strong>Your Connected Wallet:</strong>
                   </p>
                   <p className="break-all font-mono text-xs text-foreground">
                     {walletAddress}
                   </p>
-
-                  <p className="mt-3 text-sm text-muted-foreground">
-                    <strong>Required Admin Wallet:</strong>
-                  </p>
-                  <p className="break-all font-mono text-xs text-foreground">
-                    {ADMIN_WALLET_ADDRESS}
-                  </p>
                 </div>
 
                 <p className="text-center text-sm text-muted-foreground">
-                  Please connect with the admin wallet that deployed the smart contract.
+                  This wallet is not authorized as an admin. Ask the primary admin
+                  to add this address using the "Manage Admins" section of the admin
+                  portal, then refresh this page.
                 </p>
 
                 <Button
@@ -638,6 +640,7 @@ export default function AdminPortal() {
             {currentAction === 'register' && <RegisterStudent />}
             {currentAction === 'issue' && <IssueCertificate />}
             {currentAction === 'records' && <ViewAllRecords />}
+            {currentAction === 'admins' && <ManageAdmins />}
           </div>
         )}
       </div>

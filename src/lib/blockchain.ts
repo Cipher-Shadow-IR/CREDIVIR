@@ -19,22 +19,27 @@ export const CONTRACT_ABI = [
   'function getAllEnrollmentNumbers() public view returns (string[])',
   'function getTotalCertificates() public view returns (uint256)',
   'function getAdmin() public view returns (address)',
+  'function addAdmin(address _newAdmin) public',
+  'function removeAdmin(address _adminAddress) public',
+  'function getAllAdmins() public view returns (address[])',
+  'function isAdminAddress(address _address) public view returns (bool)',
   'function isAdmin() public view returns (bool)',
   'function admin() public view returns (address)',
   'function totalCertificates() public view returns (uint256)',
   'function isCertificateNumberExists(string _certificateNumber) public view returns (bool)'
 ];
 
-export const DEFAULT_CONTRACT_ADDRESS = '0x99d7FedF6906d83974FC030dC699074bF5C33b1a';
-export const ADMIN_WALLET_ADDRESS = '0xbC165a95C0D0d9918a890b3F96A286E86B961cC5';
-
 interface ViteEnv {
+  VITE_CONTRACT_ADDRESS?: string;
+  VITE_ADMIN_WALLET_ADDRESS?: string;
   VITE_SEPOLIA_RPC_URL?: string;
 }
 
-export const SEPOLIA_RPC_URL =
-  (import.meta.env as ViteEnv).VITE_SEPOLIA_RPC_URL ||
-  'https://ethereum-sepolia-rpc.publicnode.com';
+const env = import.meta.env as ViteEnv;
+
+export const DEFAULT_CONTRACT_ADDRESS = env.VITE_CONTRACT_ADDRESS || '';
+export const ADMIN_WALLET_ADDRESS = env.VITE_ADMIN_WALLET_ADDRESS || '';
+export const SEPOLIA_RPC_URL = env.VITE_SEPOLIA_RPC_URL || '';
 export const SEPOLIA_CHAIN_ID = 11155111;
 export const SEPOLIA_CHAIN_ID_HEX = '0xaa36a7';
 
@@ -179,6 +184,34 @@ export class BlockchainService {
       throw new Error('Contract not initialized');
     }
     return await this.contract.admin();
+  }
+
+  async addAdmin(adminAddress: string): Promise<ethers.ContractTransaction> {
+    if (!this.contract) {
+      throw new Error('Contract not initialized');
+    }
+    return await this.contract.addAdmin(adminAddress);
+  }
+
+  async removeAdmin(adminAddress: string): Promise<ethers.ContractTransaction> {
+    if (!this.contract) {
+      throw new Error('Contract not initialized');
+    }
+    return await this.contract.removeAdmin(adminAddress);
+  }
+
+  async getAllAdmins(): Promise<string[]> {
+    if (!this.contract) {
+      throw new Error('Contract not initialized');
+    }
+    return await this.contract.getAllAdmins();
+  }
+
+  async isAdminAddress(adminAddress: string): Promise<boolean> {
+    if (!this.contract) {
+      throw new Error('Contract not initialized');
+    }
+    return await this.contract.isAdminAddress(adminAddress);
   }
 
   async registerStudent(
