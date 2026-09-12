@@ -40,7 +40,6 @@ export const CredivirPreloader: React.FC = () => {
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center bg-background" aria-hidden="true">
       <div className="flex flex-col items-center gap-6 text-center select-none">
-        {/* Shield / Verification Mark */}
         <div className="relative">
           <div className="absolute -inset-6 rounded-full bg-primary/10 blur-2xl" />
           <div data-pre-ring className="h-20 w-20 rounded-2xl border border-primary/30 bg-card/60 backdrop-blur flex items-center justify-center shadow-xl [animation:credivir_pulse_2s_ease-in-out_infinite]">
@@ -48,7 +47,6 @@ export const CredivirPreloader: React.FC = () => {
           </div>
         </div>
 
-        {/* Wordmark */}
         <div className="space-y-1">
           <span className="font-display text-lg font-bold tracking-widest uppercase text-foreground block">
             CREDIVIR<span className="text-primary">.</span>
@@ -58,7 +56,6 @@ export const CredivirPreloader: React.FC = () => {
           </span>
         </div>
 
-        {/* Precise progress line */}
         <div className="w-52 space-y-1.5">
           <div className="h-px w-full overflow-hidden bg-muted rounded-full">
             <div

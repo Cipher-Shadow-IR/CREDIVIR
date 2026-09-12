@@ -1,26 +1,3 @@
-// student registration blockchain me ho raha hai
-
-// student fetch blockchain se ho raha hai
-
-// IssueCertificate bhi blockchain se student data la raha hai
-
-
-// To is file me abhi kya update karna best hai
-
-// Main isme:
-
-// structure clean kar raha hoon
-
-// localStorage load safer bana raha hoon
-
-// certificate number duplicate guard strong kar raha hoon
-
-// clearCertificates same rakhoonga
-
-// Ye file certificate cache/store ke liye enough rahegi.
-
-// Full updated AppContext.tsx
-
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 export interface StoredCertificate {
@@ -120,24 +97,4 @@ export function useAppContext() {
 
   return context;
 }
-
-
-// Kya change hua
-
-// 1. Safe localStorage parsing
-
-// Agar localStorage corrupt hua to app crash nahi karega.
-
-// 2. Duplicate protection stronger
-
-// Ab:
-
-// same certificateHash duplicate nahi hoga
-
-// same certificateNumber duplicate nahi hoga
-
-
-// 3. Enrollment lookup improved
-
-// Case/spacing issue avoid hoga.
 

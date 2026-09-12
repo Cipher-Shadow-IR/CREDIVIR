@@ -20,7 +20,6 @@ export function Navbar() {
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/85 backdrop-blur-xl transition-all">
       <div className="container flex h-16 items-center justify-between">
-        {/* Brand */}
         <Link to="/" className="flex items-center gap-3 group">
           <img
             src="/CREDIVIR_LOGO.png"
@@ -36,7 +35,6 @@ export function Navbar() {
           </div>
         </Link>
 
-        {/* Desktop Navigation */}
         <div className="hidden items-center gap-1 md:flex">
           {navLinks.map((link) => {
             const Icon = link.icon;
@@ -59,7 +57,6 @@ export function Navbar() {
           })}
         </div>
 
-        {/* Action Button & Ishaan Ray attribution & Theme Toggle */}
         <div className="hidden items-center gap-3 lg:flex">
           <a
             href="https://galaxir.vercel.app"
@@ -71,7 +68,6 @@ export function Navbar() {
             <ArrowUpRight className="h-3 w-3" />
           </a>
 
-          {/* Light / Dark Mode Toggle */}
           <Button
             variant="outline"
             size="icon"
@@ -95,7 +91,6 @@ export function Navbar() {
           </Button>
         </div>
 
-        {/* Mobile Menu Button & Quick Theme Toggle */}
         <div className="flex items-center gap-2 md:hidden">
           <Button
             variant="ghost"
@@ -121,7 +116,6 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Navigation */}
       {isMenuOpen && (
         <div className="border-t border-border/50 bg-background/95 backdrop-blur-lg p-4 md:hidden">
           <div className="flex flex-col gap-2">

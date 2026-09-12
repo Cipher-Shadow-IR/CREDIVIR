@@ -19,6 +19,7 @@ jspm_packages/
 dist/
 dist-ssr/
 *.local
+*.tsbuildinfo
 
 # Editor & OS files
 .vscode/*
@@ -30,6 +31,10 @@ dist-ssr/
 *.njsproj
 *.sln
 *.sw?
+
+# Hardhat build artifacts & cache
+artifacts/
+cache/
 
 # Environment variables
 .env

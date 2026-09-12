@@ -1,18 +1,3 @@
-// on-chain certificateNumber read hoga
-
-// verify result me same number show hoga
-
-// hash ya verify link dono se verify ho sakta hai
-
-// upload QR image se verify ho sakta hai
-
-// camera feature hata diya gaya hai
-
-// PDF preview/download bhi same on-chain certificate number ke saath hoga
-
-
-// Full updated src/pages/VerifyCertificate.tsx
-
 import { useState, useRef, useEffect } from 'react';
 import {
   CheckCircle,
@@ -53,7 +38,7 @@ import { Html5Qrcode } from 'html5-qrcode';
 import {
   DEFAULT_CONTRACT_ADDRESS,
   Certificate,
-  GANACHE_RPC_URL
+  SEPOLIA_RPC_URL
 } from '@/lib/blockchain';
 import { ethers } from 'ethers';
 import { CertificatePreview } from '@/components/admin/CertificatePreview';
@@ -133,7 +118,7 @@ export default function VerifyCertificate() {
     setIsVerifying(true);
 
     try {
-      const provider = new ethers.providers.JsonRpcProvider(GANACHE_RPC_URL);
+      const provider = new ethers.providers.JsonRpcProvider(SEPOLIA_RPC_URL);
       const contract = new ethers.Contract(
         DEFAULT_CONTRACT_ADDRESS,
         [
@@ -230,20 +215,108 @@ export default function VerifyCertificate() {
     }
   }, [location.search]);
 
+  const renderPdfToImage = async (file: File): Promise<File> => {
+    const pdfjs = await import('pdfjs-dist');
+
+    pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+      'pdfjs-dist/build/pdf.worker.min.mjs',
+      import.meta.url
+    ).toString();
+
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
+    const page = await pdf.getPage(1);
+
+    const outputScale = 3;
+    const viewport = page.getViewport({ scale: outputScale });
+
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.floor(viewport.width);
+    canvas.height = Math.floor(viewport.height);
+
+    await page.render({
+      canvas,
+      canvasContext: canvas.getContext('2d') as CanvasRenderingContext2D,
+      viewport,
+      background: '#ffffff'
+    }).promise;
+
+    const blob = await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob(resolve, 'image/png')
+    );
+
+    if (!blob) {
+      throw new Error('Could not convert the PDF to an image.');
+    }
+
+    return new File([blob], `${file.name.replace(/\.pdf$/i, '')}.png`, {
+      type: 'image/png'
+    });
+  };
+
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
+    const isImage = file.type.startsWith('image/');
+    const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+
+    if (!isImage && !isPdf) {
+      toast({
+        title: 'Unsupported File',
+        description:
+          'Please upload a PNG/JPG certificate image or a PDF certificate document.',
+        variant: 'destructive'
+      });
+
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      return;
+    }
+
+    let scanTarget: File = file;
+    let didConvertPdf = false;
+
+    if (isPdf && !isImage) {
+      try {
+        scanTarget = await renderPdfToImage(file);
+        didConvertPdf = true;
+      } catch (err: any) {
+        toast({
+          title: 'PDF Could Not Be Read',
+          description:
+            'The PDF could not be processed. Please try an image screenshot of the certificate QR code instead.',
+          variant: 'destructive'
+        });
+
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+        return;
+      }
+    }
+
     try {
       const html5Qrcode = new Html5Qrcode('file-scanner');
-      const result = await html5Qrcode.scanFile(file, true);
+      const result = await html5Qrcode.scanFile(scanTarget, false);
       setSearchHash(result);
       verifyCertificate(result);
       await html5Qrcode.clear();
+
+      if (didConvertPdf) {
+        toast({
+          title: 'PDF Processed',
+          description: 'Certificate extracted from PDF and QR code detected.'
+        });
+      }
     } catch (err: any) {
       toast({
         title: 'Scan Failed',
-        description: 'Could not find a valid QR code in the uploaded file.',
+        description:
+          'Could not find a valid QR code in ' +
+          (didConvertPdf ? 'the PDF document' : 'the uploaded image') +
+          '. Ensure the certificate QR code is clearly visible.',
         variant: 'destructive'
       });
     }
@@ -642,7 +715,8 @@ export default function VerifyCertificate() {
                         Upload a certificate image with QR code
                       </p>
                       <p className="mt-2 text-xs text-muted-foreground">
-                        PNG/JPG works best. PDF upload may not scan reliably.
+                        Upload the certificate image (PNG/JPG) or the issued PDF
+                        document. PDFs are rendered and scanned automatically.
                       </p>
 
                       <input

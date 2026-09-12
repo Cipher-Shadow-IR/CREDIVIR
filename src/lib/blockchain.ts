@@ -1,21 +1,16 @@
 import { ethers } from 'ethers';
 
-// Contract ABI - matches the updated Solidity contract
 export const CONTRACT_ABI = [
-  // Events
   'event CertificateIssued(string indexed certificateHash, string certificateNumber, string studentName, string enrollmentNumber, string course, uint256 issueDate, address issuerAddress)',
   'event StudentRegistered(string indexed enrollmentNumber, string studentName, uint256 registrationDate)',
   'event CertificateVerified(string indexed certificateHash, bool isValid, uint256 verificationTime)',
 
-  // Admin functions
   'function registerStudent(string _enrollmentNumber, string _name, string _email, string _mobileNumber, string _department, string _batchYear, string _password) public',
   'function issueCertificate(string _certificateHash, string _certificateNumber, string _enrollmentNumber, string _studentName, string _course, string _institution, uint256 _issueYear, string _ipfsHash) public',
 
-  // Verification functions
   'function verifyCertificate(string _certificateHash) public returns (bool)',
   'function verifyCertificateView(string _certificateHash) public view returns (bool)',
 
-  // Getter functions
   'function getCertificate(string _certificateHash) public view returns (string certificateNumber, string studentName, string enrollmentNumber, string course, string institution, uint256 issueYear, uint256 issueDate, string ipfsHash, address issuerAddress)',
   'function getStudent(string _enrollmentNumber) public view returns (string name, string email, string mobileNumber, string department, string batchYear, bool isRegistered, uint256 registrationDate)',
   'function verifyStudentLogin(string _enrollmentNumber, string _password) public view returns (bool)',
@@ -30,17 +25,18 @@ export const CONTRACT_ABI = [
   'function isCertificateNumberExists(string _certificateNumber) public view returns (bool)'
 ];
 
-// ============================================
-// CONFIGURATION - UPDATE THESE AFTER REDEPLOY
-// ============================================
+export const DEFAULT_CONTRACT_ADDRESS = '0x99d7FedF6906d83974FC030dC699074bF5C33b1a';
+export const ADMIN_WALLET_ADDRESS = '0xbC165a95C0D0d9918a890b3F96A286E86B961cC5';
 
-export const DEFAULT_CONTRACT_ADDRESS = '0x92f6653E7FF0652A2d7042857D838c141ee7797F';
-export const ADMIN_WALLET_ADDRESS = '0xE894bc126822B8FBbeD56133E27221a0fC74DAd3';
+interface ViteEnv {
+  VITE_SEPOLIA_RPC_URL?: string;
+}
 
-// Ganache Network Configuration
-export const GANACHE_RPC_URL = 'http://127.0.0.1:7545';
-export const GANACHE_CHAIN_ID = 1337;
-export const GANACHE_CHAIN_ID_HEX = '0x539';
+export const SEPOLIA_RPC_URL =
+  (import.meta.env as ViteEnv).VITE_SEPOLIA_RPC_URL ||
+  'https://ethereum-sepolia-rpc.publicnode.com';
+export const SEPOLIA_CHAIN_ID = 11155111;
+export const SEPOLIA_CHAIN_ID_HEX = '0xaa36a7';
 
 export interface Certificate {
   certificateNumber: string;
@@ -106,11 +102,11 @@ export class BlockchainService {
       let chainId = await window.ethereum.request({ method: 'eth_chainId' });
       console.log('Connected to Chain ID:', chainId);
 
-      if (chainId !== GANACHE_CHAIN_ID_HEX) {
+      if (chainId !== SEPOLIA_CHAIN_ID_HEX) {
         try {
           await window.ethereum.request({
             method: 'wallet_switchEthereumChain',
-            params: [{ chainId: GANACHE_CHAIN_ID_HEX }]
+            params: [{ chainId: SEPOLIA_CHAIN_ID_HEX }]
           });
         } catch (switchError: any) {
           if (switchError.code === 4902) {
@@ -118,26 +114,26 @@ export class BlockchainService {
               method: 'wallet_addEthereumChain',
               params: [
                 {
-                  chainId: GANACHE_CHAIN_ID_HEX,
-                  chainName: 'Ganache Local',
+                  chainId: SEPOLIA_CHAIN_ID_HEX,
+                  chainName: 'Sepolia Testnet',
                   nativeCurrency: {
-                    name: 'ETH',
-                    symbol: 'ETH',
+                    name: 'SepoliaETH',
+                    symbol: 'SepoliaETH',
                     decimals: 18
                   },
-                  rpcUrls: [GANACHE_RPC_URL]
+                  rpcUrls: [SEPOLIA_RPC_URL]
                 }
               ]
             });
           } else {
-            throw new Error('Please switch MetaMask to Ganache network manually.');
+            throw new Error('Please switch MetaMask to Sepolia network manually.');
           }
         }
 
         chainId = await window.ethereum.request({ method: 'eth_chainId' });
 
-        if (chainId !== GANACHE_CHAIN_ID_HEX) {
-          throw new Error('MetaMask is not connected to Ganache (Chain ID 1337).');
+        if (chainId !== SEPOLIA_CHAIN_ID_HEX) {
+          throw new Error('MetaMask is not connected to Sepolia (Chain ID 11155111).');
         }
       }
 
@@ -352,7 +348,6 @@ export class BlockchainService {
 
 export const blockchainService = new BlockchainService();
 
-// Generate certificate hash using SHA-256
 export async function generateCertificateHash(data: {
   studentName: string;
   enrollmentNumber: string;

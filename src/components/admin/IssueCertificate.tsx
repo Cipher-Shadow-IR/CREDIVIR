@@ -1,23 +1,3 @@
-
-// Is version me:
-
-// enrollment se student fetch hota hai
-
-// student name auto-fill hota hai
-
-// course manual input hai
-
-// certificateNumber generate hota hai
-
-// contract ko bhi certificateNumber pass hota hai
-
-// on-chain duplicate certificate number check bhi hai
-
-// AI upload tab hata diya gaya hai
-
-
-// Full updated src/components/admin/IssueCertificate.tsx
-
 import { useRef, useState } from 'react';
 import {
   FileCheck,
@@ -231,18 +211,64 @@ export function IssueCertificate() {
       return;
     }
 
+    const holder = (element.closest('.cert-preview-holder') ||
+      null) as HTMLElement | null;
+
+    const previous = holder
+      ? {
+          display: holder.style.display,
+          position: holder.style.position,
+          left: holder.style.left,
+          top: holder.style.top,
+          zIndex: holder.style.zIndex
+        }
+      : null;
+
     try {
       setIsDownloadingPdf(true);
 
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      if (holder) {
+        holder.style.display = 'block';
+        holder.style.position = 'fixed';
+        holder.style.left = '0';
+        holder.style.top = '0';
+        holder.style.zIndex = '-1';
+        holder.style.width = `${element.offsetWidth || 794}px`;
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 400));
+
+      const width = element.offsetWidth || 794;
+      const height = element.offsetHeight || 1123;
+
+      if (width === 0 || height === 0) {
+        throw new Error('Certificate preview has no rendered size.');
+      }
 
       const canvas = await html2canvas(element, {
         scale: 3,
         useCORS: true,
-        backgroundColor: '#ffffff'
+        backgroundColor: '#ffffff',
+        width,
+        height,
+        windowWidth: width,
+        windowHeight: height
       });
 
+      if (canvas.width === 0 || canvas.height === 0) {
+        throw new Error('Certificate preview could not be rendered.');
+      }
+
       const imgData = canvas.toDataURL('image/png');
+
+      const isEmptyOrInvalid =
+        !imgData.startsWith('data:image/png;base64,') ||
+        imgData === 'data:image/png;base64,';
+
+      if (isEmptyOrInvalid) {
+        throw new Error('Certificate preview could not be rendered.');
+      }
+
       const pdf = new jsPDF('p', 'mm', 'a4');
 
       pdf.addImage(imgData, 'PNG', 0, 0, 210, 297);
@@ -259,6 +285,14 @@ export function IssueCertificate() {
         variant: 'destructive'
       });
     } finally {
+      if (holder && previous) {
+        holder.style.display = previous.display;
+        holder.style.position = previous.position;
+        holder.style.left = previous.left;
+        holder.style.top = previous.top;
+        holder.style.zIndex = previous.zIndex;
+        holder.style.width = '';
+      }
       setIsDownloadingPdf(false);
     }
   };
@@ -493,7 +527,7 @@ export function IssueCertificate() {
             </Button>
           </div>
 
-          <div className="mt-8 hidden">
+          <div className="cert-preview-holder mt-8 hidden">
             <CertificatePreview
               ref={successPreviewRef}
               certificateNumber={result.certificateNumber}
@@ -645,23 +679,30 @@ export function IssueCertificate() {
 
         <div className="grid gap-4 md:grid-cols-2">
           <div>
-            <Label>Student Photo</Label>
+            <Label>Student Photo (record only)</Label>
             <Input
               type="file"
               accept="image/*"
               onChange={(e) => handleFileUpload(e, 'photo')}
               className="mt-2"
             />
+            <p className="mt-1 text-xs text-muted-foreground">
+              Stored with the record; not shown on the generated certificate.
+            </p>
           </div>
 
           <div>
-            <Label>Certificate PDF</Label>
+            <Label>Certificate PDF (record only)</Label>
             <Input
               type="file"
               accept=".pdf,image/*"
               onChange={(e) => handleFileUpload(e, 'pdf')}
               className="mt-2"
             />
+            <p className="mt-1 text-xs text-muted-foreground">
+              Stored with the record; the Download button generates the official
+              certificate.
+            </p>
           </div>
         </div>
 
@@ -723,7 +764,7 @@ export function IssueCertificate() {
             />
           </div>
         ) : (
-          <div className="hidden">
+          <div className="cert-preview-holder hidden">
             <CertificatePreview
               ref={previewRef}
               certificateNumber={previewCertificateNumber}

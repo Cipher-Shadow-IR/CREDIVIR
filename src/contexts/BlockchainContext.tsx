@@ -1,20 +1,3 @@
-// Isme:
-
-// updated blockchain.ts use hoga
-
-// wallet connect
-
-// contract init
-
-// admin check
-
-// disconnect/reset
-
-// state management clean rahega
-
-
-// Full updated src/contexts/BlockchainContext.tsx
-
 import React, { createContext, useContext, useMemo, useState, ReactNode } from 'react';
 import { blockchainService } from '@/lib/blockchain';
 

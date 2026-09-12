@@ -1,33 +1,3 @@
-// Isme kya change hua
-
-// course field remove
-
-// add kiya:
-
-// mobileNumber
-
-// department
-
-// batchYear
-
-
-// duplicate check enrollment number par hi
-
-// required fields:
-
-// enrollment number
-
-// full name
-
-// password
-
-
-// email optional
-
-// new service.registerStudent() params ke hisaab se update
-
-// Full updated src/components/admin/RegisterStudent.tsx
-
 import { useState } from 'react';
 import { UserPlus, CheckCircle2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -142,7 +112,6 @@ export function RegisterStudent() {
         return;
       }
     } catch {
-      // continue if student does not exist
     }
 
     try {

@@ -31,7 +31,6 @@ export const CountUp: React.FC<CountUpProps> = ({
           const step = (timestamp: number) => {
             if (!startTime) startTime = timestamp;
             const progress = Math.min((timestamp - startTime) / duration, 1);
-            // Ease out expo
             const easeProgress = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
             const currentVal = easeProgress * end;
 

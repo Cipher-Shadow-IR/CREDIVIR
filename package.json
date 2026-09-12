@@ -8,7 +8,9 @@
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "compile": "hardhat compile",
+    "deploy:sepolia": "hardhat run scripts/deploy.cjs --network sepolia"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -53,6 +55,7 @@
     "jspdf": "^4.2.0",
     "lucide-react": "^0.462.0",
     "next-themes": "^0.3.0",
+    "pdfjs-dist": "^6.3.289",
     "qrcode": "^1.5.4",
     "qrcode.react": "^4.2.0",
     "react": "^18.3.1",
@@ -70,6 +73,9 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.32.0",
+    "@nomicfoundation/hardhat-network-helpers": "^1.1.2",
+    "@nomiclabs/hardhat-ethers": "^2.2.3",
+    "@nomiclabs/hardhat-waffle": "^2.0.6",
     "@tailwindcss/typography": "^0.5.16",
     "@types/node": "^22.16.5",
     "@types/qrcode": "^1.5.6",
@@ -77,10 +83,14 @@
     "@types/react-dom": "^18.3.7",
     "@vitejs/plugin-react-swc": "^3.11.0",
     "autoprefixer": "^10.4.21",
+    "chai": "^4.3.10",
+    "dotenv": "^16.4.5",
     "eslint": "^9.32.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
+    "ethereum-waffle": "^4.0.10",
     "globals": "^15.15.0",
+    "hardhat": "^2.19.4",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.8.3",

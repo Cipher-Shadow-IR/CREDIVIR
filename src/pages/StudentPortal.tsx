@@ -53,7 +53,7 @@ import {
 import {
   DEFAULT_CONTRACT_ADDRESS,
   Certificate,
-  GANACHE_RPC_URL
+  SEPOLIA_RPC_URL
 } from '@/lib/blockchain';
 import { ethers } from 'ethers';
 import { CertificatePreview } from '@/components/admin/CertificatePreview';
@@ -113,7 +113,7 @@ export default function StudentPortal() {
     setIsLoading(true);
 
     try {
-      const provider = new ethers.providers.JsonRpcProvider(GANACHE_RPC_URL);
+      const provider = new ethers.providers.JsonRpcProvider(SEPOLIA_RPC_URL);
 
       const contract = new ethers.Contract(
         DEFAULT_CONTRACT_ADDRESS,

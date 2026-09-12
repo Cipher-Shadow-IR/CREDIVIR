@@ -12,7 +12,6 @@ export const CredivirLoader: React.FC<CredivirLoaderProps> = ({
 }) => {
   return (
     <div className="flex flex-col items-center justify-center p-8 text-center space-y-6">
-      {/* Animated Official CREDIVIR Logo Preloader */}
       <div className="relative flex items-center justify-center w-20 h-20">
         <div className="absolute inset-0 rounded-full border border-primary/20 animate-ping opacity-60" />
         <div className="absolute inset-1 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />

@@ -1,21 +1,3 @@
-// on-chain certificateNumber add ho gaya
-
-// new student fields use ho rahe hain:
-
-// mobileNumber
-
-// department
-
-// batchYear
-
-
-// student course hata diya gaya
-
-// certificate table me certificate number column add hai
-
-
-// Full updated src/components/admin/ViewAllRecords.tsx
-
 import { useEffect, useMemo, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
