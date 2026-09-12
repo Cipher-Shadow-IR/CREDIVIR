@@ -7,6 +7,32 @@ contract CertificateVerification {
     address[] private allAdmins;
     uint256 public totalCertificates;
 
+    struct AdminRequest {
+        address requester;
+        string name;
+        string email;
+        string reason;
+        uint256 requestTime;
+        bool resolved;
+        bool approved;
+    }
+
+    AdminRequest[] private adminRequests;
+    mapping(address => bool) private hasPendingRequest;
+    bool public adminRequestsEnabled = true;
+
+    event AdminAccessRequested(
+        address indexed requester,
+        string name,
+        uint256 requestTime
+    );
+
+    event AdminRequestHandled(
+        address indexed requester,
+        bool approved,
+        uint256 requestTime
+    );
+
     struct Certificate {
         string certificateNumber;
         string studentName;
@@ -94,6 +120,102 @@ contract CertificateVerification {
 
     function isAdminAddress(address _address) public view returns (bool) {
         return admins[_address];
+    }
+
+    function setAdminRequestsEnabled(bool _enabled) public onlyAdmin {
+        adminRequestsEnabled = _enabled;
+    }
+
+    function requestAdminAccess(
+        string memory _name,
+        string memory _email,
+        string memory _reason
+    ) public {
+        require(admins[msg.sender] == false, "Already an admin");
+        require(adminRequestsEnabled, "Admin requests are currently disabled");
+        require(
+            !hasPendingRequest[msg.sender],
+            "You already have a pending admin request"
+        );
+        require(bytes(_name).length > 0, "Name cannot be empty");
+
+        adminRequests.push(
+            AdminRequest({
+                requester: msg.sender,
+                name: _name,
+                email: _email,
+                reason: _reason,
+                requestTime: block.timestamp,
+                resolved: false,
+                approved: false
+            })
+        );
+
+        hasPendingRequest[msg.sender] = true;
+
+        emit AdminAccessRequested(msg.sender, _name, block.timestamp);
+    }
+
+    function approveAdminRequest(uint256 _index) public onlyAdmin {
+        require(_index < adminRequests.length, "Invalid request index");
+        AdminRequest storage request = adminRequests[_index];
+        require(!request.resolved, "Request already handled");
+
+        request.resolved = true;
+        request.approved = true;
+
+        if (!admins[request.requester]) {
+            admins[request.requester] = true;
+            allAdmins.push(request.requester);
+        }
+
+        hasPendingRequest[request.requester] = false;
+
+        emit AdminRequestHandled(request.requester, true, request.requestTime);
+    }
+
+    function rejectAdminRequest(uint256 _index) public onlyAdmin {
+        require(_index < adminRequests.length, "Invalid request index");
+        AdminRequest storage request = adminRequests[_index];
+        require(!request.resolved, "Request already handled");
+
+        request.resolved = true;
+        request.approved = false;
+        hasPendingRequest[request.requester] = false;
+
+        emit AdminRequestHandled(request.requester, false, request.requestTime);
+    }
+
+    function getAdminRequestCount() public view returns (uint256) {
+        return adminRequests.length;
+    }
+
+    function getAdminRequest(
+        uint256 _index
+    )
+        public
+        view
+        returns (
+            address requester,
+            string memory name,
+            string memory email,
+            string memory reason,
+            uint256 requestTime,
+            bool resolved,
+            bool approved
+        )
+    {
+        require(_index < adminRequests.length, "Invalid request index");
+        AdminRequest storage request = adminRequests[_index];
+        return (
+            request.requester,
+            request.name,
+            request.email,
+            request.reason,
+            request.requestTime,
+            request.resolved,
+            request.approved
+        );
     }
 
     function registerStudent(

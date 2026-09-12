@@ -13,7 +13,9 @@ import {
   RefreshCw,
   Link as LinkIcon,
   Search,
-  Copy
+  Copy,
+  Send,
+  Loader2
 } from 'lucide-react';
 
 import AnalyticsDashboard from '@/components/admin/AnalyticsDashboard';
@@ -67,6 +69,13 @@ export default function AdminPortal() {
   const [searchTerm, setSearchTerm] = useState('');
   const [courseFilter, setCourseFilter] = useState('All');
   const [yearFilter, setYearFilter] = useState('All');
+
+  const [requestName, setRequestName] = useState('');
+  const [requestEmail, setRequestEmail] = useState('');
+  const [requestReason, setRequestReason] = useState('');
+  const [requestSubmitted, setRequestSubmitted] = useState(false);
+  const [requestSubmitting, setRequestSubmitting] = useState(false);
+  const [requestsEnabled, setRequestsEnabled] = useState(true);
 
   const {
     isConnected,
@@ -132,6 +141,45 @@ export default function AdminPortal() {
     });
     setDashboardCertificates([]);
     disconnect();
+  };
+
+  const handleRequestAccess = async () => {
+    if (!requestName.trim()) {
+      toast({
+        title: 'Name Required',
+        description: 'Please enter your name with the request.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    try {
+      setRequestSubmitting(true);
+      const tx = await service.requestAdminAccess(
+        requestName.trim(),
+        requestEmail.trim(),
+        requestReason.trim()
+      );
+      toast({
+        title: 'Request Submitted',
+        description: 'Waiting for confirmation on Sepolia...'
+      });
+      await tx.wait();
+      setRequestSubmitted(true);
+      toast({
+        title: 'Admin Request Sent',
+        description:
+          'The primary admin has been notified. Check back in 1 business day and refresh to see if you have been added.'
+      });
+    } catch (err: any) {
+      toast({
+        title: 'Request Failed',
+        description: err.message || 'Could not submit admin request.',
+        variant: 'destructive'
+      });
+    } finally {
+      setRequestSubmitting(false);
+    }
   };
 
   const loadDashboardStats = async () => {
@@ -204,6 +252,13 @@ export default function AdminPortal() {
   useEffect(() => {
     if (connectedContract && isAdmin) {
       refreshDashboard();
+    }
+
+    if (connectedContract && !isAdmin) {
+      service
+        .getAdminRequestsEnabled()
+        .then(setRequestsEnabled)
+        .catch(() => {});
     }
   }, [connectedContract, isAdmin]);
 
@@ -393,10 +448,10 @@ export default function AdminPortal() {
                   <AlertCircle className="h-6 w-6 text-destructive" />
                 </div>
                 <CardTitle className="text-xl text-destructive">
-                  ⚠️ Unauthorized Admin
+                  ⚠️ Access Required
                 </CardTitle>
                 <CardDescription>
-                  This wallet is not authorized to access admin functions.
+                  This wallet is not authorized as an admin yet.
                 </CardDescription>
               </CardHeader>
 
@@ -410,11 +465,78 @@ export default function AdminPortal() {
                   </p>
                 </div>
 
-                <p className="text-center text-sm text-muted-foreground">
-                  This wallet is not authorized as an admin. Ask the primary admin
-                  to add this address using the "Manage Admins" section of the admin
-                  portal, then refresh this page.
-                </p>
+                {requestSubmitted ? (
+                  <div className="rounded-lg border border-primary/30 bg-primary/5 p-4 text-center">
+                    <CheckCircle2 className="mx-auto mb-2 h-8 w-8 text-success" />
+                    <p className="text-sm font-medium">
+                      Admin request submitted!
+                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      The primary admin reviews requests within 1 business day.
+                      Refresh this page later and you will see the admin
+                      dashboard once your wallet is approved.
+                    </p>
+                  </div>
+                ) : !requestsEnabled ? (
+                  <div className="rounded-lg border border-border bg-muted/40 p-4 text-center text-sm text-muted-foreground">
+                    Admin access requests are currently closed. Please contact
+                    the primary admin directly.
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div>
+                      <Label htmlFor="req-name">Your Name</Label>
+                      <Input
+                        id="req-name"
+                        placeholder="e.g. Rahul Sharma"
+                        value={requestName}
+                        onChange={(e) => setRequestName(e.target.value)}
+                        className="mt-1"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="req-email">Email (optional)</Label>
+                      <Input
+                        id="req-email"
+                        type="email"
+                        placeholder="you@example.com"
+                        value={requestEmail}
+                        onChange={(e) => setRequestEmail(e.target.value)}
+                        className="mt-1"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="req-reason">Reason (optional)</Label>
+                      <Input
+                        id="req-reason"
+                        placeholder="e.g. I am testing the admin portal"
+                        value={requestReason}
+                        onChange={(e) => setRequestReason(e.target.value)}
+                        className="mt-1"
+                      />
+                    </div>
+
+                    <Button
+                      onClick={handleRequestAccess}
+                      disabled={requestSubmitting}
+                      className="w-full gap-2"
+                    >
+                      {requestSubmitting ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Send className="h-4 w-4" />
+                      )}
+                      {requestSubmitting ? 'Sending Request...' : 'Request Admin Access'}
+                    </Button>
+
+                    <p className="text-center text-[11px] text-muted-foreground">
+                      Your request is stored on-chain and the primary admin will
+                      be notified. Approval typically takes 1 business day.
+                    </p>
+                  </div>
+                )}
 
                 <Button
                   onClick={handleDisconnect}
@@ -422,7 +544,7 @@ export default function AdminPortal() {
                   className="w-full gap-2"
                 >
                   <LogOut className="h-4 w-4" />
-                  Disconnect & Try Admin Wallet
+                  Disconnect Wallet
                 </Button>
               </CardContent>
             </Card>

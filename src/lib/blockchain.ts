@@ -23,6 +23,13 @@ export const CONTRACT_ABI = [
   'function removeAdmin(address _adminAddress) public',
   'function getAllAdmins() public view returns (address[])',
   'function isAdminAddress(address _address) public view returns (bool)',
+  'function setAdminRequestsEnabled(bool _enabled) public',
+  'function requestAdminAccess(string _name, string _email, string _reason) public',
+  'function approveAdminRequest(uint256 _index) public',
+  'function rejectAdminRequest(uint256 _index) public',
+  'function getAdminRequestCount() public view returns (uint256)',
+  'function getAdminRequest(uint256 _index) public view returns (address requester, string name, string email, string reason, uint256 requestTime, bool resolved, bool approved)',
+  'function adminRequestsEnabled() public view returns (bool)',
   'function isAdmin() public view returns (bool)',
   'function admin() public view returns (address)',
   'function totalCertificates() public view returns (uint256)',
@@ -64,6 +71,17 @@ export interface Student {
   batchYear: string;
   isRegistered: boolean;
   registrationDate: number;
+}
+
+export interface AdminAccessRequest {
+  index: number;
+  requester: string;
+  name: string;
+  email: string;
+  reason: string;
+  requestTime: number;
+  resolved: boolean;
+  approved: boolean;
 }
 
 declare global {
@@ -212,6 +230,78 @@ export class BlockchainService {
       throw new Error('Contract not initialized');
     }
     return await this.contract.isAdminAddress(adminAddress);
+  }
+
+  async setAdminRequestsEnabled(enabled: boolean): Promise<ethers.ContractTransaction> {
+    if (!this.contract) {
+      throw new Error('Contract not initialized');
+    }
+    return await this.contract.setAdminRequestsEnabled(enabled);
+  }
+
+  async getAdminRequestsEnabled(): Promise<boolean> {
+    if (!this.contract) {
+      throw new Error('Contract not initialized');
+    }
+    return await this.contract.adminRequestsEnabled();
+  }
+
+  async requestAdminAccess(
+    name: string,
+    email: string,
+    reason: string
+  ): Promise<ethers.ContractTransaction> {
+    if (!this.contract) {
+      throw new Error('Contract not initialized');
+    }
+    return await this.contract.requestAdminAccess(name, email, reason);
+  }
+
+  async getAdminRequestCount(): Promise<number> {
+    if (!this.contract) {
+      throw new Error('Contract not initialized');
+    }
+    const count = await this.contract.getAdminRequestCount();
+    return count.toNumber();
+  }
+
+  async getAdminRequests(): Promise<AdminAccessRequest[]> {
+    if (!this.contract) {
+      throw new Error('Contract not initialized');
+    }
+
+    const count = await this.getAdminRequestCount();
+    const requests: AdminAccessRequest[] = [];
+
+    for (let i = 0; i < count; i++) {
+      const r = await this.contract.getAdminRequest(i);
+      requests.push({
+        index: i,
+        requester: r.requester,
+        name: r.name,
+        email: r.email,
+        reason: r.reason,
+        requestTime: r.requestTime.toNumber(),
+        resolved: r.resolved,
+        approved: r.approved
+      });
+    }
+
+    return requests;
+  }
+
+  async approveAdminRequest(index: number): Promise<ethers.ContractTransaction> {
+    if (!this.contract) {
+      throw new Error('Contract not initialized');
+    }
+    return await this.contract.approveAdminRequest(index);
+  }
+
+  async rejectAdminRequest(index: number): Promise<ethers.ContractTransaction> {
+    if (!this.contract) {
+      throw new Error('Contract not initialized');
+    }
+    return await this.contract.rejectAdminRequest(index);
   }
 
   async registerStudent(

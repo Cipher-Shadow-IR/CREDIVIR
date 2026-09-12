@@ -1,5 +1,17 @@
 import { useEffect, useState } from 'react';
-import { ShieldCheck, ShieldOff, UserPlus, Users, Loader2, Copy, Check } from 'lucide-react';
+import {
+  ShieldCheck,
+  ShieldOff,
+  UserPlus,
+  Users,
+  UserX,
+  Loader2,
+  Copy,
+  Check,
+  Inbox,
+  Mail,
+  CalendarClock
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -10,8 +22,10 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { useBlockchain } from '@/contexts/BlockchainContext';
 import { useToast } from '@/hooks/use-toast';
+import { AdminAccessRequest } from '@/lib/blockchain';
 import { ethers } from 'ethers';
 
 export function ManageAdmins() {
@@ -23,6 +37,12 @@ export function ManageAdmins() {
   const [loadingAdmins, setLoadingAdmins] = useState(false);
   const [submitting, setSubmitting] = useState<'add' | 'remove' | null>(null);
   const [copied, setCopied] = useState(false);
+
+  const [requests, setRequests] = useState<AdminAccessRequest[]>([]);
+  const [requestsEnabled, setRequestsEnabled] = useState(true);
+  const [loadingRequests, setLoadingRequests] = useState(false);
+  const [togglingRequests, setTogglingRequests] = useState(false);
+  const [handlingRequest, setHandlingRequest] = useState<number | null>(null);
 
   const loadAdmins = async () => {
     try {
@@ -40,8 +60,29 @@ export function ManageAdmins() {
     }
   };
 
+  const loadRequests = async () => {
+    try {
+      setLoadingRequests(true);
+      const [result, enabled] = await Promise.all([
+        service.getAdminRequests(),
+        service.getAdminRequestsEnabled()
+      ]);
+      setRequests(result);
+      setRequestsEnabled(enabled);
+    } catch (err: any) {
+      toast({
+        title: 'Failed to Load Requests',
+        description: err.message || 'Could not load admin requests.',
+        variant: 'destructive'
+      });
+    } finally {
+      setLoadingRequests(false);
+    }
+  };
+
   useEffect(() => {
     loadAdmins();
+    loadRequests();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -116,6 +157,94 @@ export function ManageAdmins() {
   const isSelf = (address: string) =>
     address.toLowerCase() === walletAddress.toLowerCase();
 
+  const handleToggleRequests = async () => {
+    try {
+      setTogglingRequests(true);
+      const target = !requestsEnabled;
+      const tx = await service.setAdminRequestsEnabled(target);
+      toast({
+        title: target ? 'Enabling Requests' : 'Disabling Requests',
+        description: 'Waiting for the transaction to be confirmed...'
+      });
+      await tx.wait();
+      setRequestsEnabled(target);
+      toast({
+        title: target ? 'Requests Enabled' : 'Requests Disabled',
+        description: target
+          ? 'New testers can request admin access again.'
+          : 'New admin requests are now blocked.'
+      });
+    } catch (err: any) {
+      toast({
+        title: 'Toggle Failed',
+        description: err.message || 'Could not update request settings.',
+        variant: 'destructive'
+      });
+    } finally {
+      setTogglingRequests(false);
+    }
+  };
+
+  const handleApproveRequest = async (request: AdminAccessRequest) => {
+    try {
+      setHandlingRequest(request.index);
+      const tx = await service.approveAdminRequest(request.index);
+      toast({
+        title: 'Approving Request',
+        description: 'Waiting for the transaction to be confirmed...'
+      });
+      await tx.wait();
+      await Promise.all([loadRequests(), loadAdmins()]);
+      toast({
+        title: 'Request Approved',
+        description: `${request.name} (${request.requester.slice(0, 8)}...) is now an admin.`
+      });
+    } catch (err: any) {
+      toast({
+        title: 'Approval Failed',
+        description: err.message || 'Transaction failed.',
+        variant: 'destructive'
+      });
+    } finally {
+      setHandlingRequest(null);
+    }
+  };
+
+  const handleRejectRequest = async (request: AdminAccessRequest) => {
+    try {
+      setHandlingRequest(request.index);
+      const tx = await service.rejectAdminRequest(request.index);
+      toast({
+        title: 'Rejecting Request',
+        description: 'Waiting for the transaction to be confirmed...'
+      });
+      await tx.wait();
+      await loadRequests();
+      toast({
+        title: 'Request Rejected',
+        description: `${request.name}'s access request was rejected.`
+      });
+    } catch (err: any) {
+      toast({
+        title: 'Reject Failed',
+        description: err.message || 'Transaction failed.',
+        variant: 'destructive'
+      });
+    } finally {
+      setHandlingRequest(null);
+    }
+  };
+
+  const pendingRequests = requests
+    .filter((r) => !r.resolved)
+    .sort((a, b) => b.requestTime - a.requestTime);
+
+  const formatTime = (ts: number) =>
+    new Date(ts * 1000).toLocaleString('en-IN', {
+      dateStyle: 'medium',
+      timeStyle: 'short'
+    });
+
   return (
     <div className="space-y-6">
       <Card className="glass-card">
@@ -156,6 +285,121 @@ export function ManageAdmins() {
               {submitting === 'add' ? 'Adding...' : 'Add Admin'}
             </Button>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card className="glass-card border-primary/20">
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between gap-3">
+            <span className="flex items-center gap-2">
+              <Inbox className="h-5 w-5 text-primary" />
+              Admin Access Requests
+            </span>
+
+            <span className="flex items-center gap-2 text-sm font-normal">
+              <span className="text-muted-foreground">
+                {requestsEnabled ? 'Accepting' : 'Closed'}
+              </span>
+              <Switch
+                checked={requestsEnabled}
+                onCheckedChange={handleToggleRequests}
+                disabled={togglingRequests}
+                aria-label="Toggle admin access requests"
+              />
+            </span>
+          </CardTitle>
+          <CardDescription>
+            Testers who want admin access submit a request here. Approve to add
+            them, or keep requests closed to block new submissions.
+          </CardDescription>
+        </CardHeader>
+
+        <CardContent>
+          {loadingRequests ? (
+            <div className="flex justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+          ) : pendingRequests.length === 0 ? (
+            <div className="rounded-lg border border-dashed py-8 text-center">
+              <Mail className="mx-auto mb-2 h-8 w-8 text-muted-foreground/50" />
+              <p className="text-sm text-muted-foreground">
+                No pending admin requests.{' '}
+                {requestsEnabled
+                  ? 'Testers can request access from the admin login screen.'
+                  : 'Requests are currently closed to block spam.'}
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {pendingRequests.map((request) => (
+                <div
+                  key={request.index}
+                  className="rounded-lg border border-border/60 bg-muted/30 p-4"
+                >
+                  <div className="mb-3 flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10">
+                        <Users className="h-4 w-4 text-primary" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold">{request.name}</p>
+                        <p className="break-all font-mono text-[11px] text-muted-foreground">
+                          {request.requester}
+                        </p>
+                      </div>
+                    </div>
+
+                    <span className="flex shrink-0 items-center gap-1 rounded-md bg-muted px-2 py-1 text-[11px] text-muted-foreground">
+                      <CalendarClock className="h-3 w-3" />
+                      {formatTime(request.requestTime)}
+                    </span>
+                  </div>
+
+                  {request.email && (
+                    <p className="mb-1 text-xs text-muted-foreground">
+                      <strong>Email:</strong> {request.email}
+                    </p>
+                  )}
+                  {request.reason && (
+                    <p className="mb-3 text-xs text-muted-foreground">
+                      <strong>Reason:</strong> {request.reason}
+                    </p>
+                  )}
+
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <Button
+                      size="sm"
+                      className="gap-1.5"
+                      onClick={() => handleApproveRequest(request)}
+                      disabled={handlingRequest === request.index}
+                    >
+                      {handlingRequest === request.index ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ) : (
+                        <ShieldCheck className="h-3.5 w-3.5" />
+                      )}
+                      Approve & Add as Admin
+                    </Button>
+
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="gap-1.5 text-destructive"
+                      onClick={() => handleRejectRequest(request)}
+                      disabled={handlingRequest === request.index}
+                    >
+                      {handlingRequest === request.index ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ) : (
+                        <UserX className="h-3.5 w-3.5" />
+                      )}
+                      Reject
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
 
